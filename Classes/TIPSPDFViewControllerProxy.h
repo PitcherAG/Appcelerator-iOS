@@ -79,6 +79,9 @@
 /// Bookmark the current page
 - (void)bookmarkPage:(id)arg;
 
+/// Exposes a helper to change link annotation stroke width. Set to change.
+- (void)setLinkAnnotationStrokeWidth:(id)arg;
+
 /// Exposes a helper to change link annotation color. Set to change.
 - (void)setLinkAnnotationBorderColor:(id)arg;
 
@@ -106,8 +109,8 @@
 /// Document's menu actions.
 - (void)setAllowedMenuActions:(id)arg;
 
-/// Expose the scrollingEnabled property
-- (void)setScrollingEnabled:(id)args;
+/// Expose the scrollEnabled property
+- (void)setScrollEnabled:(id)args;
 
 // Save changed annotations.
 - (void)saveAnnotations:(id)args;

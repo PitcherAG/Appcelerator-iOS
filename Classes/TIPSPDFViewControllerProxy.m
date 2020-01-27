@@ -50,6 +50,7 @@ void (^tipspdf_targetActionBlock(id target, SEL action))(id) {
 
 @property (nonatomic) KrollCallback  *didTapOnAnnotationCallback;
 @property (nonatomic, weak) TiProxy *parentProxy;
+@property (atomic) CGFloat linkAnnotationBackedStrokeWidth;
 @property (atomic) UIColor *linkAnnotationBorderBackedColor;
 @property (atomic) UIColor *linkAnnotationHighlightBackedColor;
 
@@ -91,7 +92,7 @@ void (^tipspdf_targetActionBlock(id target, SEL action))(id) {
             page = [[self page] unsignedIntegerValue];
         });
     }else {
-        page = self.controller.page;
+        page = self.controller.pageIndex;
     }
 
     return @(page);
@@ -112,6 +113,14 @@ void (^tipspdf_targetActionBlock(id target, SEL action))(id) {
 
 - (id)documentPath {
     return [[self.controller.document fileURL] path];
+}
+
+- (void)setLinkAnnotationStrokeWidth:(id)arg {
+    ENSURE_UI_THREAD(setLinkAnnotationStrokeWidth, arg);
+    
+    self.linkAnnotationBackedStrokeWidth = [PSPDFUtils floatValue:arg];
+    // Ensure controller is reloaded.
+    [self.controller reloadData];
 }
 
 - (void)setLinkAnnotationBorderColor:(id)arg {
@@ -211,11 +220,11 @@ void (^tipspdf_targetActionBlock(id target, SEL action))(id) {
     }
 }
 
-- (void)setScrollingEnabled:(id)args {
-    ENSURE_UI_THREAD(setScrollingEnabled, args);
+- (void)setScrollEnabled:(id)args {
+    ENSURE_UI_THREAD(setScrollEnabled, args);
 
     NSUInteger pageValue = [PSPDFUtils intValue:args onPosition:0];
-    [_controller setScrollingEnabled:pageValue];
+    [_controller.documentViewController setScrollEnabled:pageValue];
 }
 
 - (void)scrollToPage:(id)args {
@@ -225,7 +234,7 @@ void (^tipspdf_targetActionBlock(id target, SEL action))(id) {
     NSUInteger pageValue = [PSPDFUtils intValue:args onPosition:0];
     NSUInteger animationValue = [PSPDFUtils intValue:args onPosition:1];
     BOOL animated = animationValue == NSNotFound || animationValue == 1;
-    [self.controller setPage:pageValue animated:animated];
+    [self.controller setPageIndex:pageValue animated:animated];
 }
 
 - (void)setViewMode:(id)args {
@@ -278,7 +287,7 @@ void (^tipspdf_targetActionBlock(id target, SEL action))(id) {
     ENSURE_UI_THREAD(saveAnnotations, args);
 
     NSError *error = nil;
-    BOOL success = [self.controller.document saveAnnotationsWithError:&error];
+    BOOL success = [self.controller.document saveWithOptions:nil error:&error];
     if (!success && self.controller.configuration.isTextSelectionEnabled)  {
         PSCLog(@"Saving annotations failed: %@", [error localizedDescription]);
     }
@@ -404,10 +413,10 @@ _Pragma("clang diagnostic pop")
 }
 
 /// delegate for tapping on an annotation. If you don't implement this or return false, it will be processed by default action (scroll to page, ask to open Safari)
-- (BOOL)pdfViewController:(PSPDFViewController *)pdfController didTapOnAnnotation:(PSPDFAnnotation *)annotation annotationPoint:(CGPoint)annotationPoint annotationView:(UIView<PSPDFAnnotationViewProtocol> *)annotationView pageView:(PSPDFPageView *)pageView viewPoint:(CGPoint)viewPoint {
+- (BOOL)pdfViewController:(PSPDFViewController *)pdfController didTapOnAnnotation:(PSPDFAnnotation *)annotation annotationPoint:(CGPoint)annotationPoint annotationView:(UIView<PSPDFAnnotationPresenting> *)annotationView pageView:(PSPDFPageView *)pageView viewPoint:(CGPoint)viewPoint {
     NSParameterAssert([pdfController isKindOfClass:[TIPSPDFViewController class]]);
 
-    NSMutableDictionary *eventDict = [NSMutableDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithInteger:pageView.page], @"page", nil];
+    NSMutableDictionary *eventDict = [NSMutableDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithInteger:pageView.pageIndex], @"page", nil];
     // only set a subset
     if ([annotation isKindOfClass:[PSPDFLinkAnnotation class]]) {
         PSPDFLinkAnnotation *linkAnnotation = (PSPDFLinkAnnotation *)annotation;
@@ -452,7 +461,7 @@ _Pragma("clang diagnostic pop")
 /// controller did show/scrolled to a new page (at least 51% of it is visible)
 - (void)pdfViewController:(PSPDFViewController *)pdfController didShowPageView:(PSPDFPageView *)pageView {
     if ([[self eventProxy] _hasListeners:@"didShowPage"]) {
-        NSDictionary *eventDict = @{@"page": [NSNumber numberWithInteger:pageView.page]};
+        NSDictionary *eventDict = @{@"page": [NSNumber numberWithInteger:pageView.pageIndex]};
         [[self eventProxy] fireEvent:@"didShowPage" withObject:eventDict];
     }
 }
@@ -460,7 +469,7 @@ _Pragma("clang diagnostic pop")
 /// page was fully rendered at zoomlevel = 1
 - (void)pdfViewController:(PSPDFViewController *)pdfController didRenderPageView:(PSPDFPageView *)pageView {
     if ([[self eventProxy] _hasListeners:@"didRenderPage"]) {
-        NSDictionary *eventDict = @{@"page": [NSNumber numberWithInteger:pageView.page]};
+        NSDictionary *eventDict = @{@"page": [NSNumber numberWithInteger:pageView.pageIndex]};
         [[self eventProxy] fireEvent:@"didRenderPage" withObject:eventDict];
     }
 }
@@ -473,46 +482,49 @@ _Pragma("clang diagnostic pop")
     }
 }
 
-- (UIView <PSPDFAnnotationViewProtocol> *)pdfViewController:(PSPDFViewController *)pdfController annotationView:(UIView <PSPDFAnnotationViewProtocol> *)annotationView forAnnotation:(PSPDFAnnotation *)annotation onPageView:(PSPDFPageView *)pageView {
+- (UIView <PSPDFAnnotationPresenting> *)pdfViewController:(PSPDFViewController *)pdfController annotationView:(UIView <PSPDFAnnotationPresenting> *)annotationView forAnnotation:(PSPDFAnnotation *)annotation onPageView:(PSPDFPageView *)pageView {
 
     if (annotation.type == PSPDFAnnotationTypeLink && [annotationView isKindOfClass:[PSPDFLinkAnnotationView class]]) {
         PSPDFLinkAnnotationView *linkAnnotation = (PSPDFLinkAnnotationView *)annotationView;
         if (self.linkAnnotationBorderBackedColor) {
             linkAnnotation.borderColor = self.linkAnnotationBorderBackedColor;
         }
+        if (self.linkAnnotationBackedStrokeWidth) {
+            linkAnnotation.strokeWidth = self.linkAnnotationBackedStrokeWidth;
+        }
     }
     return annotationView;
 }
 
-- (BOOL)pdfViewController:(PSPDFViewController *)pdfController shouldShowHUD:(BOOL)animated {
-    if ([[self eventProxy] _hasListeners:@"shouldShowHUD"]) {
-        [[self eventProxy] fireEvent:@"shouldShowHUD" withObject:nil];
+- (BOOL)pdfViewController:(PSPDFViewController *)pdfController shouldShowUserInterface:(BOOL)animated {
+    if ([[self eventProxy] _hasListeners:@"shouldShowUserInterface"]) {
+        [[self eventProxy] fireEvent:@"shouldShowUserInterface" withObject:nil];
     }
-    if ([[self eventProxy] _hasListeners:@"willShowHUD"]) {
-        [[self eventProxy] fireEvent:@"willShowHUD" withObject:nil];
-    }
-    return YES;
-}
-
-- (void)pdfViewController:(PSPDFViewController *)pdfController didShowHUD:(BOOL)animated {
-    if ([[self eventProxy] _hasListeners:@"didShowHUD"]) {
-        [[self eventProxy] fireEvent:@"didShowHUD" withObject:nil];
-    }
-}
-
-- (BOOL)pdfViewController:(PSPDFViewController *)pdfController shouldHideHUD:(BOOL)animated {
-    if ([[self eventProxy] _hasListeners:@"shouldHideHUD"]) {
-        [[self eventProxy] fireEvent:@"shouldHideHUD" withObject:nil];
-    }
-    if ([[self eventProxy] _hasListeners:@"willHideHUD"]) {
-        [[self eventProxy] fireEvent:@"willHideHUD" withObject:nil];
+    if ([[self eventProxy] _hasListeners:@"willShowUserInterface"]) {
+        [[self eventProxy] fireEvent:@"willShowUserInterface" withObject:nil];
     }
     return YES;
 }
 
-- (void)pdfViewController:(PSPDFViewController *)pdfController didHideHUD:(BOOL)animated {
-    if ([[self eventProxy] _hasListeners:@"didHideHUD"]) {
-        [[self eventProxy] fireEvent:@"didHideHUD" withObject:nil];
+- (void)pdfViewController:(PSPDFViewController *)pdfController didShowUserInterface:(BOOL)animated {
+    if ([[self eventProxy] _hasListeners:@"didShowUserInterface"]) {
+        [[self eventProxy] fireEvent:@"didShowUserInterface" withObject:nil];
+    }
+}
+
+- (BOOL)pdfViewController:(PSPDFViewController *)pdfController shouldHideUserInterface:(BOOL)animated {
+    if ([[self eventProxy] _hasListeners:@"shouldHideUserInterface"]) {
+        [[self eventProxy] fireEvent:@"shouldHideUserInterface" withObject:nil];
+    }
+    if ([[self eventProxy] _hasListeners:@"willHideUserInterface"]) {
+        [[self eventProxy] fireEvent:@"willHideUserInterface" withObject:nil];
+    }
+    return YES;
+}
+
+- (void)pdfViewController:(PSPDFViewController *)pdfController didHideUserInterface:(BOOL)animated {
+    if ([[self eventProxy] _hasListeners:@"didHideUserInterface"]) {
+        [[self eventProxy] fireEvent:@"didHideUserInterface" withObject:nil];
     }
 }
 

@@ -121,11 +121,23 @@ static BOOL PSTReplaceMethodWithBlock(Class c, SEL origSEL, SEL newSEL, id block
             PSPDFAESCryptoDataProvider *cryptoWrapper = [[PSPDFAESCryptoDataProvider alloc] initWithURL:pdfURL passphraseProvider:^NSString *{
                 return passphrase;
             } salt:salt rounds:PSPDFDefaultPBKDFNumberOfRounds];
-            document = [PSPDFDocument documentWithDataProvider:cryptoWrapper];
+            document = [[PSPDFDocument alloc] initWithDataProviders:@[cryptoWrapper]];
         }
 
-        if (!document) document = [[PSPDFDocument alloc] initWithBaseURL:nil files:pdfNames];
-
+        if (!document) {
+            NSMutableArray<PSPDFCoordinatedFileDataProvider *> *dataProviders = [NSMutableArray array];
+            for (NSString *pdfPath in pdfNames) {
+                NSURL *pdfURL = [NSURL fileURLWithPath:pdfPath isDirectory:NO];
+                if ([pdfURL.pathExtension.lowercaseString isEqualToString:@"pdf"]) {
+                    PSPDFCoordinatedFileDataProvider *coordinatedFileDataProvider = [[PSPDFCoordinatedFileDataProvider alloc] initWithFileURL:pdfURL];
+                    if (coordinatedFileDataProvider) {
+                        [dataProviders addObject:coordinatedFileDataProvider];
+                    }
+                }
+            }
+            document = [[PSPDFDocument alloc] initWithDataProviders:dataProviders];
+        }
+        
         TIPSPDFViewController *pdfController = [[TIPSPDFViewController alloc] initWithDocument:document];
 
         [PSPDFUtils applyOptions:options onObject:pdfController];
@@ -153,7 +165,7 @@ static BOOL PSTReplaceMethodWithBlock(Class c, SEL origSEL, SEL newSEL, id block
 #pragma mark - Public
 
 - (id)PSPDFKitVersion {
-    return PSPDFKit.sharedInstance.version;
+    return PSPDFKit.versionString;
 }
 
 - (void)setLicenseKey:(id)license {
@@ -217,9 +229,7 @@ static BOOL PSTReplaceMethodWithBlock(Class c, SEL origSEL, SEL newSEL, id block
     NSArray *documents = [PSPDFUtils documentsFromArgs:args];
     for (PSPDFDocument *document in documents) {
         [[PSPDFKit sharedInstance].cache cacheDocument:document
-                                             pageSizes:@[[NSValue valueWithCGSize:CGSizeMake(170.f, 220.f)], [NSValue valueWithCGSize:UIScreen.mainScreen.bounds.size]]
-                                 withDiskCacheStrategy:PSPDFDiskCacheStrategyEverything
-                                            aroundPage:0];
+                                         withPageSizes:@[[NSValue valueWithCGSize:CGSizeMake(170.f, 220.f)], [NSValue valueWithCGSize:UIScreen.mainScreen.bounds.size]]];
     }
 }
 
@@ -229,10 +239,7 @@ static BOOL PSTReplaceMethodWithBlock(Class c, SEL origSEL, SEL newSEL, id block
     // be somewhat intelligent about path search
     NSArray *documents = [PSPDFUtils documentsFromArgs:args];
     for (PSPDFDocument *document in documents) {
-        NSError *error = nil;
-        if (![[PSPDFKit sharedInstance].cache removeCacheForDocument:document deleteDocument:NO error:&error]) {
-            PSCLog(@"Failed to clear cache for %@: %@", document, error);
-        }
+        [[PSPDFKit sharedInstance].cache removeCacheForDocument:document];
     }
 }
 
@@ -261,10 +268,14 @@ static BOOL PSTReplaceMethodWithBlock(Class c, SEL origSEL, SEL newSEL, id block
 
     // be somewhat intelligent about path search
     if (document && page < [document pageCount]) {
-        image = [[PSPDFKit sharedInstance].cache imageFromDocument:document page:page size:full ? UIScreen.mainScreen.bounds.size : thumbnailSize options:PSPDFCacheOptionDiskLoadSync|PSPDFCacheOptionRenderSync];
+        PSPDFMutableRenderRequest *renderRequest = [[PSPDFMutableRenderRequest alloc] initWithDocument:document];
+        renderRequest.pageIndex = page;
+        renderRequest.imageSize = full ? UIScreen.mainScreen.bounds.size : thumbnailSize;
+        image = [[PSPDFKit sharedInstance].cache imageForRequest:renderRequest imageSizeMatching:PSPDFCacheImageSizeMatchingDefault];
+
         if (!image) {
             CGSize size = full ? [[UIScreen mainScreen] bounds].size : thumbnailSize;
-            image = [document imageForPage:page size:size clippedToRect:CGRectZero annotations:nil options:nil receipt:NULL error:NULL];
+            image = [document imageForPageAtIndex:page size:size clippedToRect:CGRectZero annotations:nil options:nil error:NULL];
         }
     }
 

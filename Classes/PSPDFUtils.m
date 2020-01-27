@@ -31,6 +31,22 @@
     return intValue;
 }
 
++ (CGFloat)floatValue:(id)args {
+    return [self floatValue:args onPosition:0];
+}
+
++ (CGFloat)floatValue:(id)args onPosition:(NSUInteger)position {
+    CGFloat floatValue = NSNotFound;
+    
+    if (position == 0 && [args isKindOfClass:NSNumber.class]) {
+        floatValue = [args floatValue];
+    }else if([args isKindOfClass:NSArray.class] && [args count] > position) {
+        floatValue = [args[position] floatValue];
+    }
+    
+    return floatValue;
+}
+
 + (UIColor *)colorFromArg:(id)arg {
     if ([arg isKindOfClass:NSArray.class] && [[arg firstObject] isEqual:@"clear"]) {
         return [UIColor clearColor];
@@ -56,7 +72,7 @@
 
             // convert color
             if ([key rangeOfString:@"color" options:NSCaseInsensitiveSearch].length > 0) {
-                value = [[TiColor colorNamed:value] color];
+                value = [[TiColor colorNamed:value] _color];
             }
 
             // special handling for toolbar
