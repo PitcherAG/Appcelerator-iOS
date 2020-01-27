@@ -2,7 +2,7 @@
 //  ComPspdfkitModule.h
 //  PSPDFKit-Titanium
 //
-//  Copyright (c) 2011-2018 PSPDFKit GmbH. All rights reserved.
+//  Copyright (c) 2011-2015 PSPDFKit GmbH. All rights reserved.
 //
 //  THIS SOURCE CODE AND ANY ACCOMPANYING DOCUMENTATION ARE PROTECTED BY AUSTRIAN COPYRIGHT LAW
 //  AND MAY NOT BE RESOLD OR REDISTRIBUTED. USAGE IS BOUND TO THE PSPDFKIT LICENSE AGREEMENT.
@@ -70,7 +70,7 @@ static BOOL PSTReplaceMethodWithBlock(Class c, SEL origSEL, SEL newSEL, id block
     [self printVersionStringOnce];
 
     // Appcelerator doesn't cope well with high memory usage.
-    PSPDFKitGlobal.sharedInstance[@"com.pspdfkit.low-memory-mode"] = @YES;
+    PSPDFKit.sharedInstance[@"com.pspdfkit.low-memory-mode"] = @YES;
 }
 
 // this method is called when the module is being unloaded
@@ -121,22 +121,10 @@ static BOOL PSTReplaceMethodWithBlock(Class c, SEL origSEL, SEL newSEL, id block
             PSPDFAESCryptoDataProvider *cryptoWrapper = [[PSPDFAESCryptoDataProvider alloc] initWithURL:pdfURL passphraseProvider:^NSString *{
                 return passphrase;
             } salt:salt rounds:PSPDFDefaultPBKDFNumberOfRounds];
-            document = [[PSPDFDocument alloc] initWithDataProviders:@[cryptoWrapper]];
+            document = [PSPDFDocument documentWithDataProvider:cryptoWrapper];
         }
 
-        if (!document) {
-            NSMutableArray<PSPDFCoordinatedFileDataProvider *> *dataProviders = [NSMutableArray array];
-            for (NSString *pdfPath in pdfNames) {
-                NSURL *pdfURL = [NSURL fileURLWithPath:pdfPath isDirectory:NO];
-                if ([pdfURL.pathExtension.lowercaseString isEqualToString:@"pdf"]) {
-                    PSPDFCoordinatedFileDataProvider *coordinatedFileDataProvider = [[PSPDFCoordinatedFileDataProvider alloc] initWithFileURL:pdfURL];
-                    if (coordinatedFileDataProvider) {
-                        [dataProviders addObject:coordinatedFileDataProvider];
-                    }
-                }
-            }
-            document = [[PSPDFDocument alloc] initWithDataProviders:dataProviders];
-        }
+        if (!document) document = [[PSPDFDocument alloc] initWithBaseURL:nil files:pdfNames];
 
         TIPSPDFViewController *pdfController = [[TIPSPDFViewController alloc] initWithDocument:document];
 
@@ -165,7 +153,7 @@ static BOOL PSTReplaceMethodWithBlock(Class c, SEL origSEL, SEL newSEL, id block
 #pragma mark - Public
 
 - (id)PSPDFKitVersion {
-    return PSPDFKitGlobal.versionString;
+    return PSPDFKit.sharedInstance.version;
 }
 
 - (void)setLicenseKey:(id)license {
@@ -173,10 +161,10 @@ static BOOL PSTReplaceMethodWithBlock(Class c, SEL origSEL, SEL newSEL, id block
     if ([licenseString isKindOfClass:NSString.class] && licenseString.length > 0) {
         if (![NSThread isMainThread]) {
             dispatch_sync(dispatch_get_main_queue(), ^{
-                [PSPDFKitGlobal setLicenseKey:licenseString];
+                [PSPDFKit setLicenseKey:licenseString];
             });
         } else {
-            [PSPDFKitGlobal setLicenseKey:licenseString];
+            [PSPDFKit setLicenseKey:licenseString];
         }
     }
 }
@@ -218,7 +206,7 @@ static BOOL PSTReplaceMethodWithBlock(Class c, SEL origSEL, SEL newSEL, id block
     PSCLog(@"requesting clear cache... (spins of async)");
 
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        [[PSPDFKitGlobal sharedInstance].cache clearCache];
+        [[PSPDFKit sharedInstance].cache clearCache];
     });
 }
 
@@ -228,8 +216,10 @@ static BOOL PSTReplaceMethodWithBlock(Class c, SEL origSEL, SEL newSEL, id block
     // be somewhat intelligent about path search
     NSArray *documents = [PSPDFUtils documentsFromArgs:args];
     for (PSPDFDocument *document in documents) {
-        [[PSPDFKitGlobal sharedInstance].cache cacheDocument:document
-                                             withPageSizes:@[[NSValue valueWithCGSize:CGSizeMake(170.f, 220.f)], [NSValue valueWithCGSize:UIScreen.mainScreen.bounds.size]]];
+        [[PSPDFKit sharedInstance].cache cacheDocument:document
+                                             pageSizes:@[[NSValue valueWithCGSize:CGSizeMake(170.f, 220.f)], [NSValue valueWithCGSize:UIScreen.mainScreen.bounds.size]]
+                                 withDiskCacheStrategy:PSPDFDiskCacheStrategyEverything
+                                            aroundPage:0];
     }
 }
 
@@ -239,7 +229,10 @@ static BOOL PSTReplaceMethodWithBlock(Class c, SEL origSEL, SEL newSEL, id block
     // be somewhat intelligent about path search
     NSArray *documents = [PSPDFUtils documentsFromArgs:args];
     for (PSPDFDocument *document in documents) {
-        [[PSPDFKitGlobal sharedInstance].cache removeCacheForDocument:document];
+        NSError *error = nil;
+        if (![[PSPDFKit sharedInstance].cache removeCacheForDocument:document deleteDocument:NO error:&error]) {
+            PSCLog(@"Failed to clear cache for %@: %@", document, error);
+        }
     }
 }
 
@@ -249,7 +242,7 @@ static BOOL PSTReplaceMethodWithBlock(Class c, SEL origSEL, SEL newSEL, id block
     // be somewhat intelligent about path search
     NSArray *documents = [PSPDFUtils documentsFromArgs:args];
     for (PSPDFDocument *document in documents) {
-        [[PSPDFKitGlobal sharedInstance].cache stopCachingDocument:document];
+        [[PSPDFKit sharedInstance].cache stopCachingDocument:document];
     }
 }
 
@@ -268,14 +261,10 @@ static BOOL PSTReplaceMethodWithBlock(Class c, SEL origSEL, SEL newSEL, id block
 
     // be somewhat intelligent about path search
     if (document && page < [document pageCount]) {
-        PSPDFMutableRenderRequest *renderRequest = [[PSPDFMutableRenderRequest alloc] initWithDocument:document];
-        renderRequest.pageIndex = page;
-        renderRequest.imageSize = full ? UIScreen.mainScreen.bounds.size : thumbnailSize;
-        image = [[PSPDFKitGlobal sharedInstance].cache imageForRequest:renderRequest imageSizeMatching:PSPDFCacheImageSizeMatchingDefault error:NULL];
-
+        image = [[PSPDFKit sharedInstance].cache imageFromDocument:document page:page size:full ? UIScreen.mainScreen.bounds.size : thumbnailSize options:PSPDFCacheOptionDiskLoadSync|PSPDFCacheOptionRenderSync];
         if (!image) {
             CGSize size = full ? [[UIScreen mainScreen] bounds].size : thumbnailSize;
-            image = [document imageForPageAtIndex:page size:size clippedToRect:CGRectZero annotations:nil options:nil error:NULL];
+            image = [document imageForPage:page size:size clippedToRect:CGRectZero annotations:nil options:nil receipt:NULL error:NULL];
         }
     }
 
@@ -301,7 +290,7 @@ static BOOL PSTReplaceMethodWithBlock(Class c, SEL origSEL, SEL newSEL, id block
 - (void)setLogLevel:(id)logLevel {
     ENSURE_UI_THREAD(setLogLevel, logLevel);
 
-    [[PSPDFKitGlobal sharedInstance] setLogLevel:[PSPDFUtils intValue:logLevel]];
+    [[PSPDFKit sharedInstance] setLogLevel:[PSPDFUtils intValue:logLevel]];
     PSCLog(@"New Log level set to %d", PSPDFLogLevel);
 }
 

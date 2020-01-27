@@ -2,7 +2,7 @@
 //  TIPSPDFViewControllerProxy.h
 //  PSPDFKit-Titanium
 //
-//  Copyright (c) 2011-2018 PSPDFKit GmbH. All rights reserved.
+//  Copyright (c) 2011-2015 PSPDFKit GmbH. All rights reserved.
 //
 //  THIS SOURCE CODE AND ANY ACCOMPANYING DOCUMENTATION ARE PROTECTED BY AUSTRIAN COPYRIGHT LAW
 //  AND MAY NOT BE RESOLD OR REDISTRIBUTED. USAGE IS BOUND TO THE PSPDFKIT LICENSE AGREEMENT.
@@ -12,9 +12,6 @@
 
 #import "TiProxy.h"
 #import "TiModule.h"
-
-#import <PSPDFKit/PSPDFKit.h>
-#import <PSPDFKitUI/PSPDFKitUI.h>
 
 @class TIPSPDFViewController, ComPspdfkitModule, ComPspdfkitViewProxy;
 
@@ -33,6 +30,9 @@
 
 /// scroll to a specific page. Argument 1 = integer, argument 2 = animated. (optional, defaults to YES)
 - (void)scrollToPage:(id)args;
+
+/// change view mode argument 1 = integer, argument 2 = animated. (optional, defaults to YES)
+- (void)setViewMode:(id)args;
 
 /// change view mode argument 1 = integer, argument 2 = animated. (optional, defaults to YES)
 - (void)setViewMode:(id)args;
@@ -79,9 +79,6 @@
 /// Bookmark the current page
 - (void)bookmarkPage:(id)arg;
 
-/// Exposes a helper to change link annotation stroke width. Set to change.
-- (void)setLinkAnnotationStrokeWidth:(id)arg;
-
 /// Exposes a helper to change link annotation color. Set to change.
 - (void)setLinkAnnotationBorderColor:(id)arg;
 
@@ -97,11 +94,20 @@
 /// Exposes helper to set `outlineBarButtonItem.availableControllerOptions`
 - (void)setOutlineControllerFilterOptions:(id)arg;
 
+/// Exposes `printOptions` in `PSPDFPrintBarButtonItem`.
+- (void)setPrintOptions:(id)arg;
+
+/// Exposes `sendOptions` in `PSPDFEmailBarButtonItem`.
+- (void)setSendOptions:(id)arg;
+
+/// Exposes `openOptions` in `PSPDFOpenInBarButtonItem`.
+- (void)setOpenInOptions:(id)arg;
+
 /// Document's menu actions.
 - (void)setAllowedMenuActions:(id)arg;
 
-/// Expose the scrollEnabled property
-- (void)setScrollEnabled:(id)args;
+/// Expose the scrollingEnabled property
+- (void)setScrollingEnabled:(id)args;
 
 // Save changed annotations.
 - (void)saveAnnotations:(id)args;

@@ -2,7 +2,7 @@
 //  ComPspdfkitViewProxy.m
 //  PSPDFKit-Titanium
 //
-//  Copyright (c) 2011-2018 PSPDFKit GmbH. All rights reserved.
+//  Copyright (c) 2011-2015 PSPDFKit GmbH. All rights reserved.
 //
 //  THIS SOURCE CODE AND ANY ACCOMPANYING DOCUMENTATION ARE PROTECTED BY AUSTRIAN COPYRIGHT LAW
 //  AND MAY NOT BE RESOLD OR REDISTRIBUTED. USAGE IS BOUND TO THE PSPDFKIT LICENSE AGREEMENT.
@@ -122,11 +122,6 @@ _Pragma("clang diagnostic pop") \
     [[[self pdfView] controllerProxy] setDidTapOnAnnotationCallback:args];
 }
 
-- (void)setLinkAnnotationStrokeWidth:(id)arg {
-    ENSURE_UI_THREAD(setLinkAnnotationStrokeWidth, arg);
-    [[[self pdfView] controllerProxy] setLinkAnnotationStrokeWidth:arg];
-}
-
 - (void)setLinkAnnotationBorderColor:(id)arg {
     ENSURE_UI_THREAD(setLinkAnnotationBorderColor, arg);
     [[[self pdfView] controllerProxy] setLinkAnnotationBorderColor:arg];
@@ -157,9 +152,24 @@ _Pragma("clang diagnostic pop") \
     [[[self pdfView] controllerProxy] setEditableAnnotationTypes:arg];
 }
 
-- (void)setScrollEnabled:(id)arg {
-    ENSURE_UI_THREAD(setScrollEnabled, arg);
-    [[[self pdfView] controllerProxy] setScrollEnabled:arg];
+- (void)setScrollingEnabled:(id)arg {
+    ENSURE_UI_THREAD(setScrollingEnabled, arg);
+    [[[self pdfView] controllerProxy] setScrollingEnabled:arg];
+}
+
+- (void)setPrintOptions:(id)arg {
+    ENSURE_UI_THREAD(setPrintOptions, arg);
+    [[[self pdfView] controllerProxy] setPrintOptions:arg];
+}
+
+- (void)setSendOptions:(id)arg {
+    ENSURE_UI_THREAD(setSendOptions, arg);
+    [[[self pdfView] controllerProxy] setSendOptions:arg];
+}
+
+- (void)setOpenInOptions:(id)arg {
+    ENSURE_UI_THREAD(setOpenInOptions, arg);
+    [[[self pdfView] controllerProxy] setOpenInOptions:arg];
 }
 
 - (id)documentPath {

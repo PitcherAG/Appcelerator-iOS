@@ -2,7 +2,7 @@
 //  ComPspdfkitView.m
 //  PSPDFKit-Titanium
 //
-//  Copyright (c) 2011-2018 PSPDFKit GmbH. All rights reserved.
+//  Copyright (c) 2011-2015 PSPDFKit GmbH. All rights reserved.
 //
 //  THIS SOURCE CODE AND ANY ACCOMPANYING DOCUMENTATION ARE PROTECTED BY AUSTRIAN COPYRIGHT LAW
 //  AND MAY NOT BE RESOLD OR REDISTRIBUTED. USAGE IS BOUND TO THE PSPDFKIT LICENSE AGREEMENT.
@@ -29,18 +29,7 @@
     
     if (!_controllerProxy) { // self triggers creation
         NSArray *pdfPaths = [PSPDFUtils resolvePaths:[self.proxy valueForKey:@"filename"]];
-        NSMutableArray<PSPDFCoordinatedFileDataProvider *> *dataProviders = [NSMutableArray array];
-        for (NSString *pdfPath in pdfPaths) {
-            NSURL *pdfURL = [NSURL fileURLWithPath:pdfPath isDirectory:NO];
-            if ([pdfURL.pathExtension.lowercaseString isEqualToString:@"pdf"]) {
-                PSPDFCoordinatedFileDataProvider *coordinatedFileDataProvider = [[PSPDFCoordinatedFileDataProvider alloc] initWithFileURL:pdfURL];
-                if (coordinatedFileDataProvider) {
-                    [dataProviders addObject:coordinatedFileDataProvider];
-                }
-            }
-        }
-
-        PSPDFDocument *pdfDocument = [[PSPDFDocument alloc] initWithDataProviders:dataProviders];
+        PSPDFDocument *pdfDocument = [[PSPDFDocument alloc] initWithBaseURL:nil files:pdfPaths];
         TIPSPDFViewController *pdfController = [[TIPSPDFViewController alloc] initWithDocument:pdfDocument];
 
         NSDictionary *options = [self.proxy valueForKey:@"options"];
@@ -62,7 +51,7 @@
 
             // Support for tinting the navigation controller/bar
             if (options[@"barColor"]) {
-                UIColor *barColor = [[TiColor colorNamed:options[@"barColor"]] _color];
+                UIColor *barColor = [[TiColor colorNamed:options[@"barColor"]] color];
                 if (barColor) {
                     navController.navigationBar.tintColor = barColor;
                 }

@@ -1,6 +1,17 @@
 /*
 PSPDFKit Appcelerator Sample Code
 
+To install the module copy the included com.pspdfkit folder to the following directory on your Mac
+/Library/Aplication Support/Titanium/modules
+Then on your project modify the tiapp.xml and include the following before the final </ti:app>
+<modules>
+<module version="INSERT_CURRENT_PSPDFKIT_VERSION_NUMBER">com.pspdfkit</module>
+</modules>
+This will allow Titanium to find the module at compilation time.
+
+Note: PSPDFKit v3 needs at least Xcode 5.0 or higher and supports iOS 6.0+.
+Type "xcode-select --print-path" in the console and check that it lists the correct Xcode version.
+
 To synchronize popovers, you can listen for the "didPresentPopover" event that PSPDFKit fires after opening a popover.
 */
 
@@ -15,17 +26,17 @@ var pspdfkit = require('com.pspdfkit');
 Ti.API.info("module is => " + pspdfkit);
 
 // You need to activate your PSPDFKit before you can use it.
-// Follow the instructions in the email you get after licensing the framework.
-pspdfkit.setLicenseKey("LICENSE_KEY_GOES_HERE");
+// Follow the instructions in the email you get after purchasing from http://pspdfkit.com.
+pspdfkit.setLicenseKey("INSERT_LICENSE_HERE");
 
 // increase log level (only needed for debugging)
 // Log level 0 (nothing) to 4 (verbose) are available.
 pspdfkit.setLogLevel(3);
 
 // add custom language additions. Optional.
-// A lot of languages are built-in but can be overridden here.
+// English, German, and French are built-in but can be overridden here.
 // This dictionary is just provided so you can easily look up the words.
-// See all strings at PSPDFKit.framework/PSPDFKit.bundle/en.lproj
+// See all strings at /Users/USERNAME/Library/Application\ Support/Titanium/modules/iphone/com.pspdfkit.source/VERSIONNUMBER/example/PSPDFKit.bundle/en.lproj
 pspdfkit.setLanguageDictionary({
     "en" : {
         // general
@@ -68,7 +79,7 @@ var navButton = Ti.UI.createButton({
     title : 'Custom',
     backgroundColor : '#ae4041',
     color : '#ffffff',
-    style : Titanium.UI.iOS.SystemButtonStyle.BORDERED,
+    style : Titanium.UI.iPhone.SystemButtonStyle.BORDERED,
     height : 24
 });
 
@@ -79,7 +90,7 @@ var navButton = Ti.UI.createButton({
 modalButton.addEventListener('click', function(e) {
     // Replace PSPDFKit.pdf with your own pdf.
     // Copy the PDF to include to the Resources folder (where app.js is)
-    // After copying a new PDF, clean the project and then rebuild.
+    // After copying a new PDF, Clean the project and then rebuild.
     var pdfController = pspdfkit.showPDFAnimated('PSPDFKit.pdf', 4, // animation option: 0 = no animation, 1 = default animation, 2 = UIModalTransitionStyleCoverVertical, 3 =  UIModalTransitionStyleFlipHorizontal, 4 =  UIModalTransitionStyleCrossDissolve
     // http://developer.apple.com/library/ios/#documentation/uikit/reference/UIViewController_Class/Reference/Reference.html
     {
@@ -88,17 +99,24 @@ modalButton.addEventListener('click', function(e) {
         linkAction : 3, // PSPDFLinkActionInlineBrowser (new default)
         thumbnailSize: [200, 200], // Allows custom thumbnail size.
 
-        // toolbar config: see https://pspdfkit.com/api/ios/Classes/PSPDFViewController.html#/c:objc(cs)PSPDFViewController(py)outlineButtonItem for built in options.
-        // Built in options are sent via strings. Invalid strings will simply be ignored.
+        // toolbar config: see http://pspdfkit.com/documentation/Classes/PSPDFViewController.html#//api/name/outlineButtonItem for built in options.
+        // Built in options are send via string. Invalid strings will simply be ignored.
         leftBarButtonItems : ["closeButtonItem"],
-        rightBarButtonItems : [navButton, "thumbnailsButtonItem"],
+        rightBarButtonItems : [navButton, "viewModeButtonItem"],
 
+        // note that the "annotationButtonItem" is not available in PSPDFKit Basic (the marketplace.appcelerator.com version)
+        // to get text selection and annotation feature, purchase a full license of PSPDFKit Annotate at http://PSPDFKit.com
         additionalBarButtonItems : ["openInButtonItem", "emailButtonItem", "printButtonItem", "searchButtonItem", "outlineButtonItem", "annotationButtonItem"] // text list, does *not* support custom buttons.
 
+        //printOptions : 1, // See values from PSPDFPrintOptionsDocumentOnly
+        //openInOptions : 0x1<0|0x1<1, // See values from PSPDFDocumentSharingOptions
+        //sendOptions : 1 // See values from PSPDFDocumentSharingOptions
+
+        //editableAnnotationTypes : ["Highlight", "Ink"] // Allows you to limit the editable annotation types
         // pageMode values 0=single page, 1=double page, 2=automatic
         // some supported properties
-        // see https://pspdfkit.com/api/ios/Classes/PSPDFViewController.html
-        /* firstPageAlwaysSingle: true,
+        // see http://pspdfkit.com/documentation/Classes/PSPDFViewController.html
+        /* doublePageModeOnFirstPage: true,
          * page" : 3,
          * pageScrolling" : 1,
          * zoomingSmallDocumentsEnabled : false,
@@ -116,10 +134,6 @@ modalButton.addEventListener('click', function(e) {
 
     //pdfController.showCloseButton = false;
 
-    //pdfController.editableAnnotationTypes : ["Highlight", "Ink"] // Allows you to limit the editable annotation types
-    
-    // Set the link annotation border width
-    pdfController.linkAnnotationStrokeWidth = 1.0;
     // Changes the link annotation colors to a light red (first hex pair is optional alpha) (or use "clear" to hide)
     pdfController.linkAnnotationBorderColor = "#33FF0000";    // Border Color
     pdfController.linkAnnotationHighlightColor = "99FF0000";  // Highlight Color
@@ -129,10 +143,10 @@ modalButton.addEventListener('click', function(e) {
     // example how to hide the top left close button
     //pdfView.showCloseButton = false;
 
-    // You can save annotations using:
+    // If this is PSPDFKit Annotate, you can save annotations using:
     pdfController.saveAnnotations();
 
-    // PSPDFKit also allows you to define the annotation save destination:
+    // PSPDFKit Annotate also allows you to define the annotation save destination:
     // PSPDFAnnotationSaveModeDisabled = 0
     // PSPDFAnnotationSaveModeExternalFile = 1, // will use save/loadAnnotationsWithError of PSPDFAnnotationParser (override to ship your own)
     // PSPDFAnnotationSaveModeEmbedded = 2,
@@ -193,7 +207,7 @@ var appceleratorTestButton = Ti.UI.createButton({
     title : 'Appcelerator',
     backgroundColor : '#cccccc',
     color : '#ffffff',
-    style : Titanium.UI.iOS.SystemButtonStyle.BORDERED,
+    style : Titanium.UI.iPhone.SystemButtonStyle.BORDERED,
     width : 100
 });
 appceleratorTestButton.addEventListener('click', function(e) {
@@ -225,7 +239,7 @@ window.add(pdfView);
 // example how to start a search.
 // Window needs to be completely visible before calling this (thus the delay)
 setTimeout(function() {
-    pdfView.searchForString("iOS", true);
+    pdfView.searchForString("aspect", true);
 }, 1000);
 
 // to coordinate the internal popovers with the view, you can use hidePopover(true) (true/false is the animation value)
@@ -326,7 +340,7 @@ button4.addEventListener("click", function(e) {
     var viewMode = Ti.UI.createButtonBar({
         labels:['Close', 'Search', 'Share', 'Bookmark', 'Outline'],
         backgroundColor:"#222",
-        style:Ti.UI.iOS.SystemButtonStyle.BAR
+        style:Ti.UI.iPhone.SystemButtonStyle.BAR
     });
     customToolbarView.add(viewMode);
     
@@ -393,7 +407,7 @@ window.add(button4);
 // example how to download a PDF.
 var webDownloadTestButton = Ti.UI.createButton({
     title : 'Download PDF',
-    style : Titanium.UI.iOS.SystemButtonStyle.BORDERED,
+    style : Titanium.UI.iPhone.SystemButtonStyle.BORDERED,
 });
 window.setRightNavButton(webDownloadTestButton);
 
@@ -410,7 +424,7 @@ webDownloadTestButton.addEventListener('click', function(e) {
             },
             timeout : 15000
         });
-        xhr.open('GET', 'https://pspdfkit.com/downloads/case-study-ebriefing.pdf');
+        xhr.open('GET', 'http://www.enough.de/fileadmin/uploads/dev_guide_pdfs/Guide_11thEdition_WEB-1.pdf');
         xhr.file = Titanium.Filesystem.getFile(Titanium.Filesystem.applicationDataDirectory, fileName);
         xhr.send();
     } else {

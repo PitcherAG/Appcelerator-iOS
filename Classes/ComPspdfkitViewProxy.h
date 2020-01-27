@@ -2,7 +2,7 @@
 //  ComPspdfkitViewProxy.h
 //  PSPDFKit-Titanium
 //
-//  Copyright (c) 2011-2018 PSPDFKit GmbH. All rights reserved.
+//  Copyright (c) 2011-2015 PSPDFKit GmbH. All rights reserved.
 //
 //  THIS SOURCE CODE AND ANY ACCOMPANYING DOCUMENTATION ARE PROTECTED BY AUSTRIAN COPYRIGHT LAW
 //  AND MAY NOT BE RESOLD OR REDISTRIBUTED. USAGE IS BOUND TO THE PSPDFKIT LICENSE AGREEMENT.
@@ -36,9 +36,6 @@
 /// Register a callback for the didTapOnAnnotation event. Return true if you manually use the annotation, else false.
 - (void)setDidTapOnAnnotationCallback:(id)args;
 
-/// Exposes a helper to change link annotation stroke width. Set to change.
-- (void)setLinkAnnotationStrokeWidth:(id)arg;
-
 /// Exposes a helper to change link annotation color. Set to change.
 - (void)setLinkAnnotationBorderColor:(id)arg;
 
@@ -54,11 +51,20 @@
 /// Exposes helper to set `outlineBarButtonItem.availableControllerOptions`.
 - (void)setOutlineControllerFilterOptions:(id)arg;
 
+/// Exposes `printOptions` in `PSPDFPrintBarButtonItem`.
+- (void)setPrintOptions:(id)arg;
+
+/// Exposes `sendOptions` in `PSPDFEmailBarButtonItem`.
+- (void)setSendOptions:(id)arg;
+
+/// Exposes `openOptions` in `PSPDFOpenInBarButtonItem`.
+- (void)setOpenInOptions:(id)arg;
+
 /// Document's menu actions.
 - (void)setAllowedMenuActions:(id)arg;
 
 /// Expose the scrollingEnabled property
-- (void)setScrollEnabled:(id)arg;
+- (void)setScrollingEnabled:(id)arg;
 
 /// Return document path.
 - (id)documentPath;

@@ -2,7 +2,7 @@
 //  ComPspdfkitModule.h
 //  PSPDFKit-Titanium
 //
-//  Copyright (c) 2011-2018 PSPDFKit GmbH. All rights reserved.
+//  Copyright (c) 2011-2015 PSPDFKit GmbH. All rights reserved.
 //
 //  THIS SOURCE CODE AND ANY ACCOMPANYING DOCUMENTATION ARE PROTECTED BY AUSTRIAN COPYRIGHT LAW
 //  AND MAY NOT BE RESOLD OR REDISTRIBUTED. USAGE IS BOUND TO THE PSPDFKIT LICENSE AGREEMENT.
@@ -17,8 +17,6 @@
 
 /// PSPDFKit Titanium Bridge.
 @interface ComPspdfkitModule : TiModule
-
-__unused static BOOL PSTReplaceMethodWithBlock(Class c, SEL origSEL, SEL newSEL, id block);
 
 /// Get the version of PSPDFKit. (This is not the version of the module bridge)
 - (id)PSPDFKitVersion;

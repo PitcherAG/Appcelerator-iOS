@@ -2,7 +2,7 @@
 //  PSPDFUtils.m
 //  PSPDFKit-Titanium
 //
-//  Copyright (c) 2011-2018 PSPDFKit GmbH. All rights reserved.
+//  Copyright (c) 2011-2015 PSPDFKit GmbH. All rights reserved.
 //
 //  THIS SOURCE CODE AND ANY ACCOMPANYING DOCUMENTATION ARE PROTECTED BY AUSTRIAN COPYRIGHT LAW
 //  AND MAY NOT BE RESOLD OR REDISTRIBUTED. USAGE IS BOUND TO THE PSPDFKIT LICENSE AGREEMENT.
@@ -31,22 +31,6 @@
     return intValue;
 }
 
-+ (CGFloat)floatValue:(id)args {
-    return [self floatValue:args onPosition:0];
-}
-
-+ (CGFloat)floatValue:(id)args onPosition:(NSUInteger)position {
-    CGFloat floatValue = NSNotFound;
-
-    if (position == 0 && [args isKindOfClass:NSNumber.class]) {
-        floatValue = [args floatValue];
-    }else if([args isKindOfClass:NSArray.class] && [args count] > position) {
-        floatValue = [args[position] floatValue];
-    }
-
-    return floatValue;
-}
-
 + (UIColor *)colorFromArg:(id)arg {
     if ([arg isKindOfClass:NSArray.class] && [[arg firstObject] isEqual:@"clear"]) {
         return [UIColor clearColor];
@@ -72,7 +56,7 @@
 
             // convert color
             if ([key rangeOfString:@"color" options:NSCaseInsensitiveSearch].length > 0) {
-                value = [[TiColor colorNamed:value] _color];
+                value = [[TiColor colorNamed:value] color];
             }
 
             // special handling for toolbar
@@ -146,38 +130,16 @@
                 } else {
                     if ([object isKindOfClass:PSPDFViewController.class]) {
                         PSPDFViewController *ctrl = object;
-                        // special handling for toolbar
-                        if ([key hasSuffix:@"BarButtonItems"] && [value isKindOfClass:NSArray.class]) {
-                            PSPDFNavigationItem *navigationItem = ctrl.navigationItem;
-                            NSArray *barButtonItems = (NSArray *)value;
-                            NSArray * (^removeItems)(NSArray *, NSArray *) = ^(NSArray *barButtonItems, NSArray *itemsToRemove) {
-                                NSMutableArray *mutableBarButtonItems = barButtonItems.mutableCopy;
-                                [mutableBarButtonItems removeObjectsInArray:itemsToRemove];
-                                return mutableBarButtonItems;
-                            };
-                            if ([key isEqualToString:@"leftBarButtonItems"]) {
-                                navigationItem.rightBarButtonItems = removeItems(navigationItem.rightBarButtonItems, barButtonItems);
-                                navigationItem.leftBarButtonItems = barButtonItems;
-                                if ([barButtonItems containsObject:ctrl.closeButtonItem]) {
-                                    navigationItem.closeBarButtonItem = nil;
-                                }
+                        // set value via PSPDFConfiguration
+                        [ctrl updateConfigurationWithoutReloadingWithBuilder:^(PSPDFConfigurationBuilder *builder) {
+                            @try {
+                                [builder setValue:value forKey:key];
                             }
-                            if ([key isEqualToString:@"rightBarButtonItems"]) {
-                                navigationItem.leftBarButtonItems = removeItems(navigationItem.leftBarButtonItems, barButtonItems);
-                                navigationItem.rightBarButtonItems = barButtonItems.reverseObjectEnumerator.allObjects;
+                            @catch (NSException *exception) {
+                                PSCLog(@"Warning! Unable to set %@ for %@.", obj, key);
                             }
-                        } else {
-                            // set value via PSPDFConfiguration
-                            [ctrl updateConfigurationWithoutReloadingWithBuilder:^(PSPDFConfigurationBuilder *builder) {
-                                @try {
-                                    [builder setValue:value forKey:key];
-                                }
-                                @catch (NSException *exception) {
-                                    PSCLog(@"Warning! Unable to set %@ for %@.", obj, key);
-                                }
-                            }];
-                            isControllerNeedsReload = YES;
-                        }
+                        }];
+                        isControllerNeedsReload = YES;
                     }
                 }
             }

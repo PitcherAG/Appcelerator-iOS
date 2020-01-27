@@ -2,16 +2,13 @@
 //  PSPDFUtils.h
 //  PSPDFKit-Titanium
 //
-//  Copyright (c) 2011-2018 PSPDFKit GmbH. All rights reserved.
+//  Copyright (c) 2011-2015 PSPDFKit GmbH. All rights reserved.
 //
 //  THIS SOURCE CODE AND ANY ACCOMPANYING DOCUMENTATION ARE PROTECTED BY AUSTRIAN COPYRIGHT LAW
 //  AND MAY NOT BE RESOLD OR REDISTRIBUTED. USAGE IS BOUND TO THE PSPDFKIT LICENSE AGREEMENT.
 //  UNAUTHORIZED REPRODUCTION OR DISTRIBUTION IS SUBJECT TO CIVIL AND CRIMINAL PENALTIES.
 //  This notice may not be removed from this file.
 //
-
-#import <PSPDFKit/PSPDFKit.h>
-#import <PSPDFKitUI/PSPDFKitUI.h>
 
 @class PSPDFDocument;
 
@@ -27,17 +24,11 @@ FOUNDATION_EXTERN void (^pst_targetActionBlock(id target, SEL action))(id);
 // Helper class for argument parsing.
 @interface PSPDFUtils : NSObject
 
-// Returns an integer from an argument array.
+// Returns a integer from an argument array.
 + (NSInteger)intValue:(id)args;
 
-// Returns an integer from an argument array, on a specific position. Position starts at 0. Returns `NSNotFound` if invalid.
+// Returns a integer from an argument array, on a specific position. Position starts at 0. Returns `NSNotFound` if invalid.
 + (NSInteger)intValue:(id)args onPosition:(NSUInteger)position;
-
-// Returns a float from an argument array.
-+ (CGFloat)floatValue:(id)args;
-
-// Returns a float from an argument array, on a specific position. Position starts at 0. Returns `NSNotFound` if invalid.
-+ (CGFloat)floatValue:(id)args onPosition:(NSUInteger)position;
 
 // Uses KVO to set an option on an object.
 + (void)applyOptions:(NSDictionary *)options onObject:(id)object;
