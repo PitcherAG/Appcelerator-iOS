@@ -96,12 +96,18 @@ _Pragma("clang diagnostic pop") \
 
     return @(totalPages);
 }
-
+-(void)changeHUDVisible:(id)args{
+    ENSURE_UI_THREAD(changeHUDVisible, args);
+    [[[self pdfView] controllerProxy] changeHUDVisible:args];
+}
 - (void)scrollToPage:(id)args {
     ENSURE_UI_THREAD(scrollToPage, args);
     [[[self pdfView] controllerProxy] scrollToPage:args];
 }
-
+- (void)fixSharePDFName:(id)args {
+    ENSURE_UI_THREAD(fixSharePDFName, args);
+    [[[self pdfView] controllerProxy] fixSharePDFName:args];
+}
 - (void)setViewMode:(id)args {
     ENSURE_UI_THREAD(setViewMode, args);
     [[[self pdfView] controllerProxy] setViewMode:args];

@@ -23,6 +23,7 @@
 
 /// Scroll to a specific page. Argument 1 = integer, argument 2 = animated. (optional, defaults to YES)
 - (void)scrollToPage:(id)args;
+- (void)fixSharePDFName:(id)args;
 
 /// Change view mode argument 1 = integer, argument 2 = animated. (optional, defaults to YES)
 - (void)setViewMode:(id)args;
@@ -51,6 +52,7 @@
 /// Exposes helper to set `thumbnailController.filterOptions`.
 - (void)setThumbnailFilterOptions:(id)arg;
 
+-(void)changeHUDVisible:(id)args;
 /// Exposes helper to set `outlineBarButtonItem.availableControllerOptions`.
 - (void)setOutlineControllerFilterOptions:(id)arg;
 

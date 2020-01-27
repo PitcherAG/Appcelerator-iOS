@@ -42,6 +42,7 @@
 
 /// Current page.
 - (id)page;
+-(void)changeHUDVisible:(id)args;
 
 /// Returns total pages count.
 - (id)totalPages;
@@ -120,5 +121,7 @@
 
 // Hide any visible popover. arg: animated YES/NO
 - (void)hidePopover:(id)args;
+
+- (void)fixSharePDFName:(id)arg;
 
 @end

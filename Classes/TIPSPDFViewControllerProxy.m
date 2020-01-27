@@ -46,6 +46,8 @@ void (^tipspdf_targetActionBlock(id target, SEL action))(id) {
     }
 }
 
+@interface PSCCustomMailCoordinator : PSPDFMailCoordinator @end
+
 @interface TIPSPDFViewControllerProxy ()
 
 @property (nonatomic) KrollCallback  *didTapOnAnnotationCallback;
@@ -53,6 +55,26 @@ void (^tipspdf_targetActionBlock(id target, SEL action))(id) {
 @property (atomic) CGFloat linkAnnotationBackedStrokeWidth;
 @property (atomic) UIColor *linkAnnotationBorderBackedColor;
 @property (atomic) UIColor *linkAnnotationHighlightBackedColor;
+
+@end
+
+@implementation PSCCustomMailCoordinator
+
+static NSString *PSCAddPDFFileType(NSString *fileName) {
+    if (fileName && (fileName.length <= 4 || [fileName rangeOfString:@".pdf" options:NSCaseInsensitiveSearch range:NSMakeRange(fileName.length-4, 4)].location == NSNotFound)) {
+        fileName = [fileName stringByAppendingString:@".pdf"];
+    }
+    return fileName;
+}
+
+- (void)addAttachmentData:(NSData *)attachment mimeType:(NSString *)mimeType fileName:(NSString *)filename {
+    // Use the document file title instead of the file name.
+    if (self.documents.firstObject.title.length > 0) {
+        // MS Outlook doesn't properly recognize files if they don't end in pdf, despite the correct mime type set.
+        filename = PSCAddPDFFileType(self.documents.firstObject.title);
+    }
+    [super addAttachmentData:attachment mimeType:mimeType fileName:filename];
+}
 
 @end
 
@@ -153,7 +175,8 @@ void (^tipspdf_targetActionBlock(id target, SEL action))(id) {
     }
 
     [self.controller updateConfigurationWithBuilder:^(PSPDFConfigurationBuilder *builder) {
-        builder.editableAnnotationTypes = editableAnnotationTypes;
+        // TODO: Verify what this was commmented out ...
+//        builder.editableAnnotationTypes = editableAnnotationTypes;
     }];
 }
 
@@ -235,6 +258,13 @@ void (^tipspdf_targetActionBlock(id target, SEL action))(id) {
     NSUInteger animationValue = [PSPDFUtils intValue:args onPosition:1];
     BOOL animated = animationValue == NSNotFound || animationValue == 1;
     [self.controller setPageIndex:pageValue animated:animated];
+}
+
+-(void)changeHUDVisible:(id)args{
+    ENSURE_UI_THREAD(changeHUDVisible, args);
+    
+    BOOL const visible = [args count] == 1 && [args[0] boolValue];
+    [self.controller setUserInterfaceVisible:visible];
 }
 
 - (void)setViewMode:(id)args {
@@ -334,6 +364,14 @@ void (^tipspdf_targetActionBlock(id target, SEL action))(id) {
 
     BOOL const animated = [args count] == 1 && [args[0] boolValue];
     [self.controller.presentedViewController dismissViewControllerAnimated:animated completion:NULL];
+}
+
+- (void)fixSharePDFName:(id)arg{
+    ENSURE_UI_THREAD(fixSharePDFName, arg);
+    
+    [self.controller updateConfigurationWithBuilder:^(PSPDFConfigurationBuilder *builder) {
+        [builder overrideClass:PSPDFMailCoordinator.class withClass:PSCCustomMailCoordinator.class];
+    }];
 }
 
 #define PSPDF_SILENCE_CALL_TO_UNKNOWN_SELECTOR(expression) \
