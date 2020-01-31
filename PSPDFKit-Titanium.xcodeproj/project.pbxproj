@@ -49,9 +49,10 @@
 		7884214014830B7600203926 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7884213F14830B7600203926 /* SystemConfiguration.framework */; };
 		78ED7A57146F00FE002EE22C /* TIPSPDFViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = 78ED7A55146F00FE002EE22C /* TIPSPDFViewController.h */; };
 		78ED7A58146F00FE002EE22C /* TIPSPDFViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 78ED7A56146F00FE002EE22C /* TIPSPDFViewController.m */; };
+		92A223F723E4363A00FB6FF5 /* PSPDFKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 92A223F523E4363A00FB6FF5 /* PSPDFKit.framework */; };
+		92A223F823E4363A00FB6FF5 /* PSPDFKitUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 92A223F623E4363A00FB6FF5 /* PSPDFKitUI.framework */; };
 		AA747D9F0F9514B9006C5449 /* ComPspdfkit_Prefix.pch in Headers */ = {isa = PBXBuildFile; fileRef = AA747D9E0F9514B9006C5449 /* ComPspdfkit_Prefix.pch */; };
 		AACBBE4A0F95108600F1A2B1 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AACBBE490F95108600F1A2B1 /* Foundation.framework */; };
-		B963ECCF1D105F0F00AB1C8A /* PSPDFKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B963ECCE1D105EDB00AB1C8A /* PSPDFKit.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -97,10 +98,10 @@
 		78ED7A55146F00FE002EE22C /* TIPSPDFViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TIPSPDFViewController.h; path = Classes/TIPSPDFViewController.h; sourceTree = "<group>"; };
 		78ED7A56146F00FE002EE22C /* TIPSPDFViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TIPSPDFViewController.m; path = Classes/TIPSPDFViewController.m; sourceTree = "<group>"; };
 		78FB05B9177304060006CE08 /* libxml2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libxml2.dylib; path = usr/lib/libxml2.dylib; sourceTree = SDKROOT; };
-		845DF1911F6EC09000CA6923 /* PSPDFKitUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = PSPDFKitUI.framework; sourceTree = "<group>"; };
+		92A223F523E4363A00FB6FF5 /* PSPDFKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = PSPDFKit.framework; sourceTree = "<group>"; };
+		92A223F623E4363A00FB6FF5 /* PSPDFKitUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = PSPDFKitUI.framework; sourceTree = "<group>"; };
 		AA747D9E0F9514B9006C5449 /* ComPspdfkit_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ComPspdfkit_Prefix.pch; sourceTree = SOURCE_ROOT; };
 		AACBBE490F95108600F1A2B1 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
-		B963ECCE1D105EDB00AB1C8A /* PSPDFKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = PSPDFKit.framework; sourceTree = "<group>"; };
 		D2AAC07E0554694100DB518D /* libComPspdfkit.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libComPspdfkit.a; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -109,14 +110,15 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B963ECCF1D105F0F00AB1C8A /* PSPDFKit.framework in Frameworks */,
 				7884214014830B7600203926 /* SystemConfiguration.framework in Frameworks */,
 				7884213E14830B6E00203926 /* CFNetwork.framework in Frameworks */,
+				92A223F823E4363A00FB6FF5 /* PSPDFKitUI.framework in Frameworks */,
 				7884213C14830B6900203926 /* MobileCoreServices.framework in Frameworks */,
 				7884213A14830B6400203926 /* CoreText.framework in Frameworks */,
 				7884213814830B5E00203926 /* QuartzCore.framework in Frameworks */,
 				7884213614830B5900203926 /* CoreGraphics.framework in Frameworks */,
 				7884212B14830B4000203926 /* ImageIO.framework in Frameworks */,
+				92A223F723E4363A00FB6FF5 /* PSPDFKit.framework in Frameworks */,
 				7884212914830B3A00203926 /* MessageUI.framework in Frameworks */,
 				7884212714830B3100203926 /* MediaPlayer.framework in Frameworks */,
 				7884212514830B2E00203926 /* AVFoundation.framework in Frameworks */,
@@ -154,8 +156,8 @@
 		0867D69AFE84028FC02AAC07 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				B963ECCE1D105EDB00AB1C8A /* PSPDFKit.framework */,
-				845DF1911F6EC09000CA6923 /* PSPDFKitUI.framework */,
+				92A223F523E4363A00FB6FF5 /* PSPDFKit.framework */,
+				92A223F623E4363A00FB6FF5 /* PSPDFKitUI.framework */,
 				7884215214830D3700203926 /* System */,
 			);
 			name = Frameworks;
@@ -264,7 +266,7 @@
 				LastUpgradeCheck = 0710;
 				ORGANIZATIONNAME = "Peter Steinberger";
 			};
-			buildConfigurationList = 1DEB922208733DC00010E9CD /* Build configuration list for PBXProject "PSPDFKit-Titanium" */;
+			buildConfigurationList = 1DEB922208733DC00010E9CD /* Build configuration list for PBXProject "pspdfkit-titanium" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
 			hasScannedForEncodings = 1;
@@ -362,7 +364,7 @@
 					"$(TITANIUM_BASE_SDK)/**",
 					"$(TITANIUM_BASE_SDK2)/**",
 				);
-				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = "-fobjc-arc-exceptions";
 				SDKROOT = iphoneos;
@@ -399,7 +401,7 @@
 					"$(TITANIUM_BASE_SDK)/**",
 					"$(TITANIUM_BASE_SDK2)/**",
 				);
-				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				OTHER_LDFLAGS = "-fobjc-arc-exceptions";
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -461,7 +463,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
 		};
-		1DEB922208733DC00010E9CD /* Build configuration list for PBXProject "PSPDFKit-Titanium" */ = {
+		1DEB922208733DC00010E9CD /* Build configuration list for PBXProject "pspdfkit-titanium" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				1DEB922308733DC00010E9CD /* Debug */,

@@ -46,8 +46,6 @@ void (^tipspdf_targetActionBlock(id target, SEL action))(id) {
     }
 }
 
-@interface PSCCustomMailCoordinator : PSPDFMailCoordinator @end
-
 @interface TIPSPDFViewControllerProxy ()
 
 @property (nonatomic) KrollCallback  *didTapOnAnnotationCallback;
@@ -55,26 +53,6 @@ void (^tipspdf_targetActionBlock(id target, SEL action))(id) {
 @property (atomic) CGFloat linkAnnotationBackedStrokeWidth;
 @property (atomic) UIColor *linkAnnotationBorderBackedColor;
 @property (atomic) UIColor *linkAnnotationHighlightBackedColor;
-
-@end
-
-@implementation PSCCustomMailCoordinator
-
-static NSString *PSCAddPDFFileType(NSString *fileName) {
-    if (fileName && (fileName.length <= 4 || [fileName rangeOfString:@".pdf" options:NSCaseInsensitiveSearch range:NSMakeRange(fileName.length-4, 4)].location == NSNotFound)) {
-        fileName = [fileName stringByAppendingString:@".pdf"];
-    }
-    return fileName;
-}
-
-- (void)addAttachmentData:(NSData *)attachment mimeType:(NSString *)mimeType fileName:(NSString *)filename {
-    // Use the document file title instead of the file name.
-    if (self.documents.firstObject.title.length > 0) {
-        // MS Outlook doesn't properly recognize files if they don't end in pdf, despite the correct mime type set.
-        filename = PSCAddPDFFileType(self.documents.firstObject.title);
-    }
-    [super addAttachmentData:attachment mimeType:mimeType fileName:filename];
-}
 
 @end
 
@@ -127,7 +105,7 @@ static NSString *PSCAddPDFFileType(NSString *fileName) {
             totalPages = [[self totalPages] unsignedIntegerValue];
         });
     }else {
-        totalPages = [[NSNumber numberWithInteger:[_controller.document pageCount]] unsignedIntegerValue];
+        totalPages = [@([_controller.document pageCount]) unsignedIntegerValue];
     }
 
     return @(totalPages);
@@ -332,46 +310,11 @@ static NSString *PSCAddPDFFileType(NSString *fileName) {
     self.controller.document.annotationSaveMode = annotationSaveMode;
 }
 
-- (void)setPrintOptions:(id)arg {
-    ENSURE_SINGLE_ARG(arg, NSNumber);
-    ENSURE_UI_THREAD(setPrintOptions, arg);
-
-    [self.controller updateConfigurationWithoutReloadingWithBuilder:^(PSPDFConfigurationBuilder *builder) {
-        builder.printSharingOptions = [arg integerValue];
-    }];
-}
-
-- (void)setSendOptions:(id)arg {
-    ENSURE_SINGLE_ARG(arg, NSNumber);
-    ENSURE_UI_THREAD(setSendOptions, arg);
-
-    [self.controller updateConfigurationWithoutReloadingWithBuilder:^(PSPDFConfigurationBuilder *builder) {
-        builder.mailSharingOptions = [arg integerValue];
-    }];
-}
-
-- (void)setOpenInOptions:(id)arg {
-    ENSURE_SINGLE_ARG(arg, NSNumber);
-    ENSURE_UI_THREAD(setOpenInOptions, arg);
-
-    [self.controller updateConfigurationWithoutReloadingWithBuilder:^(PSPDFConfigurationBuilder *builder) {
-        builder.openInSharingOptions = [arg integerValue];
-    }];
-}
-
 - (void)hidePopover:(id)args {
     ENSURE_UI_THREAD(hidePopover, args);
 
     BOOL const animated = [args count] == 1 && [args[0] boolValue];
     [self.controller.presentedViewController dismissViewControllerAnimated:animated completion:NULL];
-}
-
-- (void)fixSharePDFName:(id)arg{
-    ENSURE_UI_THREAD(fixSharePDFName, arg);
-    
-    [self.controller updateConfigurationWithBuilder:^(PSPDFConfigurationBuilder *builder) {
-        [builder overrideClass:PSPDFMailCoordinator.class withClass:PSCCustomMailCoordinator.class];
-    }];
 }
 
 #define PSPDF_SILENCE_CALL_TO_UNKNOWN_SELECTOR(expression) \
@@ -454,7 +397,7 @@ _Pragma("clang diagnostic pop")
 - (BOOL)pdfViewController:(PSPDFViewController *)pdfController didTapOnAnnotation:(PSPDFAnnotation *)annotation annotationPoint:(CGPoint)annotationPoint annotationView:(UIView<PSPDFAnnotationPresenting> *)annotationView pageView:(PSPDFPageView *)pageView viewPoint:(CGPoint)viewPoint {
     NSParameterAssert([pdfController isKindOfClass:[TIPSPDFViewController class]]);
 
-    NSMutableDictionary *eventDict = [NSMutableDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithInteger:pageView.pageIndex], @"page", nil];
+    NSMutableDictionary *eventDict = [NSMutableDictionary dictionaryWithObjectsAndKeys:@(pageView.pageIndex), @"page", nil];
     // only set a subset
     if ([annotation isKindOfClass:[PSPDFLinkAnnotation class]]) {
         PSPDFLinkAnnotation *linkAnnotation = (PSPDFLinkAnnotation *)annotation;
@@ -496,19 +439,19 @@ _Pragma("clang diagnostic pop")
     return processed;
 }
 
-/// controller did show/scrolled to a new page (at least 51% of it is visible)
-- (void)pdfViewController:(PSPDFViewController *)pdfController didShowPageView:(PSPDFPageView *)pageView {
-    if ([[self eventProxy] _hasListeners:@"didShowPage"]) {
-        NSDictionary *eventDict = @{@"page": [NSNumber numberWithInteger:pageView.pageIndex]};
-        [[self eventProxy] fireEvent:@"didShowPage" withObject:eventDict];
+/// controller did begin displaying a new page (at least 51% of it is visible)
+- (void)pdfViewController:(PSPDFViewController *)pdfController willBeginDisplayingPageView:(PSPDFPageView *)pageView forPageAtIndex:(NSInteger)pageIndex {
+    if ([[self eventProxy] _hasListeners:@"willBeginDisplayingPageView"]) {
+        NSDictionary *eventDict = @{@"page": @(pageIndex)};
+        [[self eventProxy] fireEvent:@"willBeginDisplayingPageView" withObject:eventDict];
     }
 }
 
-/// page was fully rendered at zoomlevel = 1
-- (void)pdfViewController:(PSPDFViewController *)pdfController didRenderPageView:(PSPDFPageView *)pageView {
-    if ([[self eventProxy] _hasListeners:@"didRenderPage"]) {
-        NSDictionary *eventDict = @{@"page": [NSNumber numberWithInteger:pageView.pageIndex]};
-        [[self eventProxy] fireEvent:@"didRenderPage" withObject:eventDict];
+/// page was fully rendered
+- (void)pdfViewController:(PSPDFViewController *)pdfController didFinishRenderTaskForPageView:(PSPDFPageView *)pageView {
+    if ([[self eventProxy] _hasListeners:@"didFinishRenderTaskForPageView"]) {
+        NSDictionary *eventDict = @{@"page": @(pageView.pageIndex)};
+        [[self eventProxy] fireEvent:@"didFinishRenderTaskForPageView" withObject:eventDict];
     }
 }
 

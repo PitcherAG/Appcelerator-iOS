@@ -23,7 +23,6 @@
 
 /// Scroll to a specific page. Argument 1 = integer, argument 2 = animated. (optional, defaults to YES)
 - (void)scrollToPage:(id)args;
-- (void)fixSharePDFName:(id)args;
 
 /// Change view mode argument 1 = integer, argument 2 = animated. (optional, defaults to YES)
 - (void)setViewMode:(id)args;
@@ -55,15 +54,6 @@
 -(void)changeHUDVisible:(id)args;
 /// Exposes helper to set `outlineBarButtonItem.availableControllerOptions`.
 - (void)setOutlineControllerFilterOptions:(id)arg;
-
-/// Exposes `printOptions` in `PSPDFPrintBarButtonItem`.
-- (void)setPrintOptions:(id)arg;
-
-/// Exposes `sendOptions` in `PSPDFEmailBarButtonItem`.
-- (void)setSendOptions:(id)arg;
-
-/// Exposes `openOptions` in `PSPDFOpenInBarButtonItem`.
-- (void)setOpenInOptions:(id)arg;
 
 /// Document's menu actions.
 - (void)setAllowedMenuActions:(id)arg;

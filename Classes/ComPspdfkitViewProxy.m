@@ -96,18 +96,17 @@ _Pragma("clang diagnostic pop") \
 
     return @(totalPages);
 }
+
 -(void)changeHUDVisible:(id)args{
     ENSURE_UI_THREAD(changeHUDVisible, args);
     [[[self pdfView] controllerProxy] changeHUDVisible:args];
 }
+
 - (void)scrollToPage:(id)args {
     ENSURE_UI_THREAD(scrollToPage, args);
     [[[self pdfView] controllerProxy] scrollToPage:args];
 }
-- (void)fixSharePDFName:(id)args {
-    ENSURE_UI_THREAD(fixSharePDFName, args);
-    [[[self pdfView] controllerProxy] fixSharePDFName:args];
-}
+
 - (void)setViewMode:(id)args {
     ENSURE_UI_THREAD(setViewMode, args);
     [[[self pdfView] controllerProxy] setViewMode:args];
@@ -166,21 +165,6 @@ _Pragma("clang diagnostic pop") \
 - (void)setScrollEnabled:(id)arg {
     ENSURE_UI_THREAD(setScrollEnabled, arg);
     [[[self pdfView] controllerProxy] setScrollEnabled:arg];
-}
-
-- (void)setPrintOptions:(id)arg {
-    ENSURE_UI_THREAD(setPrintOptions, arg);
-    [[[self pdfView] controllerProxy] setPrintOptions:arg];
-}
-
-- (void)setSendOptions:(id)arg {
-    ENSURE_UI_THREAD(setSendOptions, arg);
-    [[[self pdfView] controllerProxy] setSendOptions:arg];
-}
-
-- (void)setOpenInOptions:(id)arg {
-    ENSURE_UI_THREAD(setOpenInOptions, arg);
-    [[[self pdfView] controllerProxy] setOpenInOptions:arg];
 }
 
 - (id)documentPath {
