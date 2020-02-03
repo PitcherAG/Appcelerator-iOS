@@ -146,6 +146,13 @@
                 } else {
                     if ([object isKindOfClass:PSPDFViewController.class]) {
                         PSPDFViewController *ctrl = object;
+                        if ([key isEqual:@"leftBarButtonItems"]) {
+                            ctrl.navigationItem.leftBarButtonItems = value;
+                        }
+                        if ([key isEqual:@"rightBarButtonItems"]) {
+                            ctrl.navigationItem.rightBarButtonItems = value;
+                        }
+
                         // set value via PSPDFConfiguration
                         [ctrl updateConfigurationWithoutReloadingWithBuilder:^(PSPDFConfigurationBuilder *builder) {
                             @try {
