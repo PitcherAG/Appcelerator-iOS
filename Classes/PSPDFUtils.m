@@ -100,7 +100,7 @@
                         [newArray addObject:newArrayItem];
                     }
                 }
-                value = newArray;
+                value = [[newArray reverseObjectEnumerator] allObjects];
             }
 
             // special case handling for annotation name list
