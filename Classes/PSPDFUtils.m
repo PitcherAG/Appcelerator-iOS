@@ -135,6 +135,8 @@
                     // Ensure document providers are re-set.
                     [document clearCache];
                     processed = YES;
+                } else if ([key isEqual:@"annotationsEnabled"]) {
+                    [document setAnnotationsEnabled: [value boolValue]];
                 }
             }
 
