@@ -82,6 +82,21 @@ _Pragma("clang diagnostic pop") \
     return @(page);
 }
 
+- (id)visiblePages {
+    PSTiLog(@"visiblePages, thread: %@ (isMain:%d)", [NSThread currentThread], [NSThread isMainThread]);
+
+    __block NSUInteger visiblePages = 0;
+    if (![NSThread isMainThread]) {
+        dispatch_sync(dispatch_get_main_queue(), ^{
+            visiblePages = [[self visiblePages] unsignedIntegerValue];
+        });
+    }else {
+        visiblePages = [[[[self pdfView] controllerProxy] visiblePages] unsignedIntegerValue];
+    }
+
+    return @(visiblePages);
+}
+
 - (id)totalPages {
     PSTiLog(@"totalPages, thread: %@ (isMain:%d)", [NSThread currentThread], [NSThread isMainThread]);
 

@@ -42,6 +42,9 @@
 
 /// Current page.
 - (id)page;
+
+- (id)visiblePages;
+
 -(void)changeHUDVisible:(id)args;
 
 /// Returns total pages count.

@@ -98,6 +98,19 @@ void (^tipspdf_targetActionBlock(id target, SEL action))(id) {
     return @(page);
 }
 
+- (id)visiblePages {
+    __block NSUInteger visiblePages = 0;
+    if (![NSThread isMainThread]) {
+        dispatch_sync(dispatch_get_main_queue(), ^{
+            visiblePages = [[self visiblePages] unsignedIntegerValue];
+        });
+    }else {
+        visiblePages = self.controller.visiblePageViews.count;
+    }
+
+    return @(visiblePages);
+}
+
 - (id)totalPages {
     __block NSUInteger totalPages = 0;
     if (![NSThread isMainThread]) {
@@ -444,6 +457,14 @@ _Pragma("clang diagnostic pop")
     if ([[self eventProxy] _hasListeners:@"willBeginDisplayingPageView"]) {
         NSDictionary *eventDict = @{@"page": @(pageIndex)};
         [[self eventProxy] fireEvent:@"willBeginDisplayingPageView" withObject:eventDict];
+    }
+}
+
+/// page view exits the visible screen area.
+- (void)pdfViewController:(PSPDFViewController *)pdfController didEndDisplayingPageView:(PSPDFPageView *)pageView forPageAtIndex:(NSInteger)pageIndex {
+    if ([[self eventProxy] _hasListeners:@"didEndDisplayingPageView"]) {
+        NSDictionary *eventDict = @{@"page": @(pageIndex)};
+        [[self eventProxy] fireEvent:@"didEndDisplayingPageView" withObject:eventDict];
     }
 }
 

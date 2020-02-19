@@ -18,6 +18,9 @@
 /// Returns the current page.
 - (id)page;
 
+/// Returns visible pages count.
+- (id)visiblePages;
+
 /// Returns total pages count.
 - (id)totalPages;
 
