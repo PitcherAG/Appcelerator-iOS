@@ -267,7 +267,8 @@ static BOOL PSTReplaceMethodWithBlock(Class c, SEL origSEL, SEL newSEL, id block
     PSPDFDocument *document = [PSPDFUtils documentsFromArgs:args].firstObject;
     NSUInteger page = [args[1] unsignedIntegerValue];
     BOOL full = [args count] < 3 || [args[2] unsignedIntegerValue] == 0;
-    CGSize thumbnailSize = CGSizeMake(170.f, 220.f);
+    CGSize imageSize = [document pageInfoForPageAtIndex:page].size;
+    CGSize thumbnailSize = CGSizeMake(floorf(imageSize.width / 2), floorf(imageSize.height) / 2);
 
     // be somewhat intelligent about path search
     if (document && page < [document pageCount]) {
