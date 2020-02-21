@@ -22,6 +22,8 @@
 /// Subclass of `PSPDFViewController` that enables sending events to Appcelerator.
 @interface TIPSPDFViewController : PSPDFViewController
 
+@property (atomic, weak) UIViewController *presentedController;
+
 /// Close controller, optionally animated.
 - (void)closeControllerAnimated:(BOOL)animated;
 

@@ -17,6 +17,7 @@
 
 @interface PSPDFViewController (Internal)
 - (void)delegateDidShowController:(id)viewController embeddedInController:(id)controller options:(NSDictionary *)options animated:(BOOL)animated;
+- (BOOL)presentViewController:(UIViewController *)controller options:(nullable NSDictionary<NSString *, id> *)options animated:(BOOL)animated sender:(nullable id)sender completion:(nullable void (^)(void))completion;
 @end
 
 @implementation TIPSPDFViewController
@@ -51,6 +52,10 @@
 - (void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
 
+    // Workaround for the issue of Note annotation view controller staying on screen after dismissing PDF view controller
+    if ([self.presentedController isKindOfClass:[PSPDFNoteAnnotationViewController class]]) {
+        [self.presentedController dismissViewControllerAnimated:NO completion:NULL];
+    }
     if (self.navigationController.isBeingDismissed) {
         [self.proxy fireEvent:@"willCloseController" withObject:nil];
     }
@@ -72,6 +77,13 @@
 
 ///////////////////////////////////////////////////////////////////////////////////////////
 #pragma mark - PSPDFViewController
+
+- (BOOL)presentViewController:(UIViewController *)controller options:(nullable NSDictionary<NSString *, id> *)options animated:(BOOL)animated sender:(nullable id)sender completion:(nullable void (^)(void))completion {
+    [super presentViewController:controller options:options animated:animated sender:sender completion:completion];
+    
+    self.presentedController = controller;
+    return YES;
+}
 
 - (void)delegateDidShowController:(id)viewController embeddedInController:(id)controller options:(NSDictionary *)options animated:(BOOL)animated {
     [super delegateDidShowController:viewController embeddedInController:controller options:options animated:animated];
