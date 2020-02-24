@@ -41,9 +41,29 @@
         }
         
         PSPDFDocument *pdfDocument = [[PSPDFDocument alloc] initWithDataProviders:dataProviders];
-        TIPSPDFViewController *pdfController = [[TIPSPDFViewController alloc] initWithDocument:pdfDocument];
-
         NSDictionary *options = [self.proxy valueForKey:@"options"];
+        
+        PSPDFDocumentSharingConfiguration *customConfiguration = [PSPDFDocumentSharingConfiguration configurationWithBuilder:^(PSPDFDocumentSharingConfigurationBuilder *builder) {
+            builder.destination = PSPDFDocumentSharingDestinationEmail;
+            builder.fileFormatOptions = PSPDFDocumentSharingFileFormatOptionPDF;
+            if ([options objectForKey:@"disableSendAnnotations"]) {
+                builder.annotationOptions &= ~(PSPDFDocumentSharingAnnotationOptionEmbed | PSPDFDocumentSharingAnnotationOptionFlatten | PSPDFDocumentSharingAnnotationOptionSummary);
+            }
+            if ([options objectForKey:@"enableSendAnnotations"]) {
+                builder.annotationOptions &= PSPDFDocumentSharingAnnotationOptionFlatten | PSPDFDocumentSharingAnnotationOptionRemove;
+            }
+            if ([options objectForKey:@"enableOnePageSend"]) {
+                builder.pageSelectionOptions = PSPDFDocumentSharingPagesOptionCurrent | PSPDFDocumentSharingPagesOptionAll;
+            } else if ([options objectForKey:@"resetSendOptions"]) {
+                builder.pageSelectionOptions = PSPDFDocumentSharingPagesOptionAll;
+            }
+        }];
+        PSPDFConfiguration *configuration = [PSPDFConfiguration configurationWithBuilder:^(PSPDFConfigurationBuilder *builder) {
+            builder.sharingConfigurations = @[customConfiguration];
+        }];
+        
+        TIPSPDFViewController *pdfController = [[TIPSPDFViewController alloc] initWithDocument:pdfDocument configuration:configuration];
+
         [PSPDFUtils applyOptions:options onObject:pdfController];
         [PSPDFUtils applyOptions:[self.proxy valueForKey:@"documentOptions"] onObject:pdfDocument];
 
