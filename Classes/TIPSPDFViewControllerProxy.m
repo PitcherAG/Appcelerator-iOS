@@ -361,7 +361,12 @@ _Pragma("clang diagnostic pop")
 }
 
 - (void)showEmailView:(id)arg {
-    [self showBarButton:@selector(emailButtonItem) action:arg];
+    // Present sharing VC manually, in order to define a delegate (PSPDFDocumentSharingViewControllerDelegate), to specify file name explicitly
+    PSPDFDocumentSharingViewController *sharingController = [[PSPDFDocumentSharingViewController alloc] initWithDocuments:@[self.controller.document]];
+    sharingController.sharingConfigurations = self.controller.configuration.sharingConfigurations;
+    sharingController.delegate = self;
+    
+    [sharingController presentFromViewController:self.controller sender:self.controller.emailButtonItem];
 }
 
 - (void)showAnnotationView:(id)arg {
@@ -528,6 +533,13 @@ _Pragma("clang diagnostic pop")
     if ([[self eventProxy] _hasListeners:@"didHideUserInterface"]) {
         [[self eventProxy] fireEvent:@"didHideUserInterface" withObject:nil];
     }
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+#pragma mark - PSPDFDocumentSharingViewControllerDelegate
+
+- (nullable NSString *)documentSharingViewController:(PSPDFDocumentSharingViewController *)shareController filenameForGeneratedFileForDocument:(PSPDFDocument *)sharingDocument destination:(PSPDFDocumentSharingDestination)destination {
+    return self.controller.document.title;
 }
 
 @end

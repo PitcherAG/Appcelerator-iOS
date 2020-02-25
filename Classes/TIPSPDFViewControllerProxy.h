@@ -19,7 +19,7 @@
 @class TIPSPDFViewController, ComPspdfkitModule, ComPspdfkitViewProxy;
 
 /// Appcelerator Proxy for PSPDFViewController. Exposes a subset.
-@interface TIPSPDFViewControllerProxy : TiProxy <TiProxyDelegate, PSPDFViewControllerDelegate>
+@interface TIPSPDFViewControllerProxy : TiProxy <TiProxyDelegate, PSPDFViewControllerDelegate, PSPDFDocumentSharingViewControllerDelegate>
 
 @property (atomic, weak) TIPSPDFViewController *controller; // we're keeping a reverse relation with associated object
 
