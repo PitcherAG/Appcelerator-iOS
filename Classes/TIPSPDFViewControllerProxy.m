@@ -363,7 +363,10 @@ _Pragma("clang diagnostic pop")
 - (void)showEmailView:(id)arg {
     // Present sharing VC manually, in order to define a delegate (PSPDFDocumentSharingViewControllerDelegate), to specify file name explicitly
     PSPDFDocumentSharingViewController *sharingController = [[PSPDFDocumentSharingViewController alloc] initWithDocuments:@[self.controller.document]];
-    sharingController.sharingConfigurations = self.controller.configuration.sharingConfigurations;
+    NSArray *emailConfigurations = [self.controller.configuration.sharingConfigurations filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(id object, NSDictionary *bindings) {
+        return [(PSPDFDocumentSharingConfiguration *)object destination] == PSPDFDocumentSharingDestinationEmail;
+    }]];
+    sharingController.sharingConfigurations = emailConfigurations;
     sharingController.delegate = self;
     
     [sharingController presentFromViewController:self.controller sender:self.controller.emailButtonItem];

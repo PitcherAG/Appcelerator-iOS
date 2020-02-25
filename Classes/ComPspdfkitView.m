@@ -43,25 +43,11 @@
         PSPDFDocument *pdfDocument = [[PSPDFDocument alloc] initWithDataProviders:dataProviders];
         NSDictionary *options = [self.proxy valueForKey:@"options"];
         
-        PSPDFDocumentSharingConfiguration *customConfiguration = [PSPDFDocumentSharingConfiguration configurationWithBuilder:^(PSPDFDocumentSharingConfigurationBuilder *builder) {
-            builder.destination = PSPDFDocumentSharingDestinationEmail;
-            builder.fileFormatOptions = PSPDFDocumentSharingFileFormatOptionPDF;
-            if ([options objectForKey:@"disableSendAnnotations"]) {
-                builder.annotationOptions &= ~(PSPDFDocumentSharingAnnotationOptionEmbed | PSPDFDocumentSharingAnnotationOptionFlatten | PSPDFDocumentSharingAnnotationOptionSummary);
-            }
-            if ([options objectForKey:@"enableSendAnnotations"]) {
-                builder.annotationOptions &= PSPDFDocumentSharingAnnotationOptionFlatten | PSPDFDocumentSharingAnnotationOptionRemove;
-            }
-            if ([options objectForKey:@"enableOnePageSend"]) {
-                builder.pageSelectionOptions = PSPDFDocumentSharingPagesOptionCurrent | PSPDFDocumentSharingPagesOptionAll;
-            } else if ([options objectForKey:@"resetSendOptions"]) {
-                builder.pageSelectionOptions = PSPDFDocumentSharingPagesOptionAll;
-            }
-        }];
         PSPDFConfiguration *configuration = [PSPDFConfiguration configurationWithBuilder:^(PSPDFConfigurationBuilder *builder) {
-            builder.sharingConfigurations = @[customConfiguration];
+            PSPDFDocumentSharingConfiguration *emailCustomConfiguration = [self getSharingConfigurationForDestination:PSPDFDocumentSharingDestinationEmail];
+            PSPDFDocumentSharingConfiguration *printCustomConfiguration = [self getSharingConfigurationForDestination:PSPDFDocumentSharingDestinationPrint];
+            builder.sharingConfigurations = @[emailCustomConfiguration, printCustomConfiguration];
         }];
-        
         TIPSPDFViewController *pdfController = [[TIPSPDFViewController alloc] initWithDocument:pdfDocument configuration:configuration];
 
         [PSPDFUtils applyOptions:options onObject:pdfController];
@@ -103,6 +89,26 @@
     return (UIViewController *)responder;
 }
 
+- (PSPDFDocumentSharingConfiguration *)getSharingConfigurationForDestination:(PSPDFDocumentSharingDestination)destination {
+    NSDictionary *options = [self.proxy valueForKey:@"options"];
+    
+    PSPDFDocumentSharingConfiguration *customConfiguration = [PSPDFDocumentSharingConfiguration configurationWithBuilder:^(PSPDFDocumentSharingConfigurationBuilder *builder) {
+        builder.destination = destination;
+        builder.fileFormatOptions = PSPDFDocumentSharingFileFormatOptionPDF;
+        if ([options objectForKey:@"disableSendAnnotations"]) {
+            builder.annotationOptions &= ~(PSPDFDocumentSharingAnnotationOptionEmbed | PSPDFDocumentSharingAnnotationOptionFlatten | PSPDFDocumentSharingAnnotationOptionSummary);
+        }
+        if ([options objectForKey:@"enableSendAnnotations"]) {
+            builder.annotationOptions &= PSPDFDocumentSharingAnnotationOptionFlatten | PSPDFDocumentSharingAnnotationOptionRemove;
+        }
+        if ([options objectForKey:@"enableOnePageSend"]) {
+            builder.pageSelectionOptions = PSPDFDocumentSharingPagesOptionCurrent | PSPDFDocumentSharingPagesOptionAll;
+        } else if ([options objectForKey:@"resetSendOptions"]) {
+            builder.pageSelectionOptions = PSPDFDocumentSharingPagesOptionAll;
+        }
+    }];
+    return customConfiguration;
+}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 #pragma mark - NSObject
