@@ -95,6 +95,9 @@
     PSPDFDocumentSharingConfiguration *customConfiguration = [PSPDFDocumentSharingConfiguration configurationWithBuilder:^(PSPDFDocumentSharingConfigurationBuilder *builder) {
         builder.destination = destination;
         builder.fileFormatOptions = PSPDFDocumentSharingFileFormatOptionPDF;
+        if ([options objectForKey:@"fullDocumentOnly"] && ![options objectForKey:@"resetSendOptions"]) {
+            builder.pageSelectionOptions = PSPDFDocumentSharingPagesOptionAll;
+        }
         if ([options objectForKey:@"disableSendAnnotations"]) {
             builder.annotationOptions &= ~(PSPDFDocumentSharingAnnotationOptionEmbed | PSPDFDocumentSharingAnnotationOptionFlatten | PSPDFDocumentSharingAnnotationOptionSummary);
         }
@@ -103,8 +106,6 @@
         }
         if ([options objectForKey:@"enableOnePageSend"]) {
             builder.pageSelectionOptions = PSPDFDocumentSharingPagesOptionCurrent | PSPDFDocumentSharingPagesOptionAll;
-        } else if ([options objectForKey:@"resetSendOptions"]) {
-            builder.pageSelectionOptions = PSPDFDocumentSharingPagesOptionAll;
         }
     }];
     return customConfiguration;
