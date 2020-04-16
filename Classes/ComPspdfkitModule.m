@@ -309,6 +309,20 @@ static BOOL PSTReplaceMethodWithBlock(Class c, SEL origSEL, SEL newSEL, id block
     PSCLog(@"New Log level set to %d", PSPDFLogLevel);
 }
 
+- (void)removeAllAnnotationsForDocument:(id)args {
+    PSPDFDocument *document = [PSPDFUtils documentsFromArgs:args].firstObject;
+    if (document == nil) { return; }
+    
+    NSDictionary *allAnnotationsDictionary = [document allAnnotationsOfType:PSPDFAnnotationTypeAll];
+    NSMutableArray *allAnnotations = [NSMutableArray array];
+    [allAnnotationsDictionary enumerateKeysAndObjectsUsingBlock: ^(NSNumber *key, NSArray *value, BOOL *stop) {
+        [allAnnotations addObjectsFromArray:value];
+    }];
+    
+    [document removeAnnotations:allAnnotations options:nil];
+    [document saveWithOptions:nil completionHandler:nil];
+}
+
 @end
 
 @implementation ComPspdfkitSourceModule @end
