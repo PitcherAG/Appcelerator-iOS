@@ -52,8 +52,8 @@
 - (void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
 
-    // Workaround for the issue of Note annotation view controller staying on screen after dismissing PDF view controller
-    if ([self.presentedController isKindOfClass:[PSPDFNoteAnnotationViewController class]]) {
+    // Workaround for the issues popover views staying on screen after dismissing PDF view controller
+    if (self.presentedController != nil) {
         [self.presentedController dismissViewControllerAnimated:NO completion:NULL];
     }
     if (self.navigationController.isBeingDismissed) {

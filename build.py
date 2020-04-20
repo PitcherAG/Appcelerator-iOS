@@ -164,7 +164,7 @@ def build_module(manifest,config):
 	
 	os.system("rm -rf build/")
 	os.system("xcodebuild -project PSPDFKit-Titanium.xcodeproj clean")
-	rc = os.system("xcodebuild -project PSPDFKit-Titanium.xcodeproj -sdk iphoneos13.2 -configuration Release -target pspdfkit")
+	rc = os.system("xcodebuild -project PSPDFKit-Titanium.xcodeproj -sdk iphoneos -configuration Release -target pspdfkit")
 	if rc != 0:
 		die("xcodebuild failed")
 	rc = os.system("xcodebuild -project PSPDFKit-Titanium.xcodeproj -sdk iphonesimulator -configuration Release -target pspdfkit")
