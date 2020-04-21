@@ -57,7 +57,7 @@ __unused static BOOL PSTReplaceMethodWithBlock(Class c, SEL origSEL, SEL newSEL,
 /// Set internal log level. Defaults to PSPDFKit default.
 - (void)setLogLevel:(id)logLevel;
 
-- (void)removeAllAnnotationsForDocument:(id)args;
+- (void)deleteDocument:(id)args;
 
 @end
 
