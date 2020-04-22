@@ -52,11 +52,12 @@
 - (void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
 
-    // Workaround for the issues popover views staying on screen after dismissing PDF view controller
-    if (self.presentedController != nil) {
-        [self.presentedController dismissViewControllerAnimated:NO completion:NULL];
-    }
     if (self.navigationController.isBeingDismissed) {
+        // Workaround for the issues popover views staying on screen after dismissing PDF view controller
+        if (self.presentedController != nil) {
+            [self.presentedController dismissViewControllerAnimated:NO completion:NULL];
+        }
+        
         [self.proxy fireEvent:@"willCloseController" withObject:nil];
     }
 }
