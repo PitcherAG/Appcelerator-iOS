@@ -47,6 +47,7 @@
             PSPDFDocumentSharingConfiguration *emailCustomConfiguration = [self getSharingConfigurationForDestination:PSPDFDocumentSharingDestinationEmail];
             PSPDFDocumentSharingConfiguration *printCustomConfiguration = [self getSharingConfigurationForDestination:PSPDFDocumentSharingDestinationPrint];
             builder.sharingConfigurations = @[emailCustomConfiguration, printCustomConfiguration];
+            builder.searchResultZoomScale = 1.0; // To disable the logic to automatically zoom to selected search result
         }];
         TIPSPDFViewController *pdfController = [[TIPSPDFViewController alloc] initWithDocument:pdfDocument configuration:configuration];
 
