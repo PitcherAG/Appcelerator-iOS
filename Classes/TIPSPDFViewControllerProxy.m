@@ -534,6 +534,9 @@ _Pragma("clang diagnostic pop")
     if ([controller isKindOfClass:PSPDFDocumentSharingViewController.class]) {
         ((PSPDFDocumentSharingViewController *)controller).delegate = self;
     }
+    if ([[self eventProxy] _hasListeners:@"didShowController"]) {
+        [[self eventProxy] fireEvent:@"didShowController" withObject:nil];
+    }
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
