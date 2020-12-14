@@ -292,6 +292,37 @@ static BOOL PSTReplaceMethodWithBlock(Class c, SEL origSEL, SEL newSEL, id block
     return proxy;
 }
 
+- (id)imageForDocumentAsBlob:(id)args {
+    PSCLog(@"Request image: %@", args);
+    if ([args count] < 2) {
+        PSCLog(@"Invalid number of arguments: %@", args);
+        return nil;
+    }
+    UIImage *image = nil;
+
+    PSPDFDocument *document = [PSPDFUtils documentsFromArgs:args].firstObject;
+    NSUInteger page = [args[1] unsignedIntegerValue];
+    BOOL full = [args count] < 3 || [args[2] unsignedIntegerValue] == 0;
+    CGSize imageSize = [document pageInfoForPageAtIndex:page].size;
+    CGSize thumbnailSize = CGSizeMake(floorf(imageSize.width / 2), floorf(imageSize.height) / 2);
+
+    // be somewhat intelligent about path search
+    if (document && page < [document pageCount]) {
+        PSPDFMutableRenderRequest *renderRequest = [[PSPDFMutableRenderRequest alloc] initWithDocument:document];
+        renderRequest.pageIndex = page;
+        renderRequest.imageSize = full ? UIScreen.mainScreen.bounds.size : thumbnailSize;
+        image = [[PSPDFKitGlobal sharedInstance].cache imageForRequest:renderRequest imageSizeMatching:PSPDFCacheImageSizeMatchingDefault error:NULL];
+
+        if (!image) {
+            CGSize size = full ? [[UIScreen mainScreen] bounds].size : thumbnailSize;
+            image = [document imageForPageAtIndex:page size:size clippedToRect:CGRectZero annotations:nil options:nil error:NULL];
+        }
+    }
+
+    id proxy = [[TiBlob alloc] initWithImage:image];
+    return proxy;
+}
+
 - (void)setLanguageDictionary:(id)dictionary {
     ENSURE_UI_THREAD(setLanguageDictionary, dictionary);
 

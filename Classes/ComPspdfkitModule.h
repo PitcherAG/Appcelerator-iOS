@@ -44,6 +44,8 @@ __unused static BOOL PSTReplaceMethodWithBlock(Class c, SEL origSEL, SEL newSEL,
 /// Document | Page | Size (Full=0/Thumb=1)
 - (id)imageForDocument:(id)args;
 
+- (id)imageForDocumentAsBlob:(id)args;
+
 /// Stops caching the document in advance. Argument is filePath.
 - (void)stopCachingDocument:(id)args;
 
