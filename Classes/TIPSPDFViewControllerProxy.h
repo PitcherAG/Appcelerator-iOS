@@ -116,4 +116,6 @@
 // Hide any visible popover. arg: animated YES/NO
 - (void)hidePopover:(id)args;
 
+- (TiProxy *)eventProxy;
+
 @end

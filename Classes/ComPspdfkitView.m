@@ -13,6 +13,7 @@
 #import "ComPspdfkitView.h"
 #import "TIPSPDFViewController.h"
 #import "PSPDFUtils.h"
+#import "SharingViewController.h"
 #import <libkern/OSAtomic.h>
 
 @interface ComPspdfkitView ()
@@ -48,6 +49,8 @@
             PSPDFDocumentSharingConfiguration *printCustomConfiguration = [self getSharingConfigurationForDestination:PSPDFDocumentSharingDestinationPrint];
             builder.sharingConfigurations = @[emailCustomConfiguration, printCustomConfiguration];
             builder.searchResultZoomScale = 1.0; // To disable the logic to automatically zoom to selected search result
+            
+            [builder overrideClass:PSPDFDocumentSharingViewController.class withClass:SharingViewController.class];
         }];
         TIPSPDFViewController *pdfController = [[TIPSPDFViewController alloc] initWithDocument:pdfDocument configuration:configuration];
 
@@ -156,12 +159,15 @@
 - (id)init {
     if ((self = [super init])) {
         PSTiLog(@"ComPspdfkitView init");
+        
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(pdfSharingEmailSent:) name:@"PDFSharingEmailSent" object:nil];
     }
     return self;
 }
 
 - (void)dealloc {
     PSTiLog(@"ComPspdfkitView dealloc");
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:@"PDFSharingEmailSent" object:nil];
     [self destroyViewControllerRelationship];
 }
 
@@ -220,6 +226,16 @@
         [TiUtils setView:_navController.view positionRect:bounds];
         [self.controllerProxy.controller reloadData];
     }    
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+#pragma mark - Custom Notifications
+
+- (void)pdfSharingEmailSent:(NSNotification *) notification
+{
+    if ([[notification name] isEqualToString:@"PDFSharingEmailSent"]) {
+        [[self.controllerProxy eventProxy] fireEvent:@"didSendMail" withObject:nil];
+    }
 }
 
 @end
