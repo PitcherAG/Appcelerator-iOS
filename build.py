@@ -167,7 +167,8 @@ def build_module(manifest,config):
 	rc = os.system("xcodebuild -project PSPDFKit-Titanium.xcodeproj -sdk iphoneos -configuration Release -target pspdfkit")
 	if rc != 0:
 		die("xcodebuild failed")
-	rc = os.system("xcodebuild -project PSPDFKit-Titanium.xcodeproj -sdk iphonesimulator -configuration Release -target pspdfkit")
+	# Excluding `arm64` architecture from the simulator build, as it caused `lipo` error, due to Xcode > 12 including `arm64` slice for M1 Macs
+	rc = os.system("xcodebuild -project PSPDFKit-Titanium.xcodeproj -sdk iphonesimulator -configuration Release -target pspdfkit EXCLUDED_ARCHS=\"arm64\"")
 	if rc != 0:
 		die("xcodebuild failed")
     # build the merged library using lipo
