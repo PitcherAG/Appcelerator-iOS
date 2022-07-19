@@ -30,6 +30,9 @@
 /// Change view mode argument 1 = integer, argument 2 = animated. (optional, defaults to YES)
 - (void)setViewMode:(id)args;
 
+/// Change the page mode (argument 1 = integer)
+- (void)setPageMode:(id)args;
+
 /// Open search.
 - (void)searchForString:(id)args;
 

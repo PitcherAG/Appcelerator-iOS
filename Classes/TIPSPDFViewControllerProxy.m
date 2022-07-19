@@ -268,6 +268,16 @@ void (^tipspdf_targetActionBlock(id target, SEL action))(id) {
     [self.controller setViewMode:viewModeValue animated:animated];
 }
 
+- (void)setPageMode:(id)args {
+    ENSURE_UI_THREAD(setPageMode, args);
+
+    PSCLog(@"setPageMode: %@", args);
+    NSUInteger pageModeValue = [PSPDFUtils intValue:args onPosition:0];
+    [self.controller updateConfigurationWithBuilder:^(PSPDFConfigurationBuilder *builder) {
+        builder.pageMode = pageModeValue;
+    }];
+}
+
 - (void)searchForString:(id)args {
     ENSURE_UI_THREAD(searchForString, args);
 

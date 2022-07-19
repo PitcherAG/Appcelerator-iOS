@@ -127,6 +127,11 @@ _Pragma("clang diagnostic pop") \
     [[[self pdfView] controllerProxy] setViewMode:args];
 }
 
+- (void)setPageMode:(id)args {
+    ENSURE_UI_THREAD(setPageMode, args);
+    [[[self pdfView] controllerProxy] setPageMode:args];
+}
+
 - (void)searchForString:(id)args {
     ENSURE_UI_THREAD(searchForString, args);
     [[[self pdfView] controllerProxy] searchForString:args];
