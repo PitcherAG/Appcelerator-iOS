@@ -37,6 +37,9 @@
 /// change view mode argument 1 = integer, argument 2 = animated. (optional, defaults to YES)
 - (void)setViewMode:(id)args;
 
+/// Change the page mode (argument 1 = integer)
+- (void)setPageMode:(id)args;
+
 /// Opens the PSPDFSearchViewController with the searchString.
 - (void)searchForString:(id)args;
 
