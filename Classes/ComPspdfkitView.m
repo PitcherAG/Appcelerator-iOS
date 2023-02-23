@@ -48,15 +48,20 @@
             PSPDFDocumentSharingConfiguration *emailCustomConfiguration = [self getSharingConfigurationForDestination:PSPDFDocumentSharingDestinationEmail];
             PSPDFDocumentSharingConfiguration *printCustomConfiguration = [self getSharingConfigurationForDestination:PSPDFDocumentSharingDestinationPrint];
             builder.sharingConfigurations = @[emailCustomConfiguration, printCustomConfiguration];
+            builder.allowToolbarTitleChange = NO;
             builder.searchResultZoomScale = 1.0; // To disable the logic to automatically zoom to selected search result
             
             [builder overrideClass:PSPDFDocumentSharingViewController.class withClass:SharingViewController.class];
         }];
         TIPSPDFViewController *pdfController = [[TIPSPDFViewController alloc] initWithDocument:pdfDocument configuration:configuration];
 
+        NSDictionary *documentOptions = [self.proxy valueForKey:@"documentOptions"];
+        NSString *documentTitle = [documentOptions valueForKey:@"title"];
         [PSPDFUtils applyOptions:options onObject:pdfController];
-        [PSPDFUtils applyOptions:[self.proxy valueForKey:@"documentOptions"] onObject:pdfDocument];
-
+        [PSPDFUtils applyOptions:documentOptions onObject:pdfDocument];
+        pdfController.title = documentTitle;
+        pdfDocument.title = [documentTitle stringByReplacingOccurrencesOfString:@"/" withString:@""];
+        
         // default-hide close button
         if (![self.proxy valueForKey:@"options"][PROPERTY(leftBarButtonItems)]) {
             pdfController.navigationItem.leftBarButtonItems = @[];
