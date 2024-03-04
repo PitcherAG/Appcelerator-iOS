@@ -428,7 +428,9 @@ _Pragma("clang diagnostic pop")
         if (linkAnnotation.URL) {
             eventDict[@"URL"] = linkAnnotation.URL;
             eventDict[@"siteLinkTarget"] = linkAnnotation.URL.absoluteString;
-        }else if (linkAnnotation.linkType == PSPDFLinkAnnotationPage) {
+        } else if (linkAnnotation.URLAction.invalidURLString != nil) {
+            eventDict[@"siteLinkTarget"] = linkAnnotation.URLAction.invalidURLString;
+        } else if (linkAnnotation.linkType == PSPDFLinkAnnotationPage) {
             // We don't forward all proxy types.
             if ([linkAnnotation.action respondsToSelector:@selector(pageIndex)]) {
                 eventDict[@"pageIndex"] = @(((PSPDFGoToAction *)linkAnnotation.action).pageIndex);
