@@ -114,9 +114,10 @@ NSString *const kTempAnnotationIdSuffix = @"_tempPitAnn";
     NSPredicate *predicate = [NSPredicate predicateWithBlock:^BOOL(PSPDFLinkAnnotation *evaluatedObject, NSDictionary *bindings) {
         NSString *invalidURLString = evaluatedObject.URLAction.invalidURLString;
         return invalidURLString.length > 0 &&
-               [invalidURLString containsString:@"%5B"] &&
-               [invalidURLString containsString:@"%5D"] &&
-               [invalidURLString containsString:@"/videos/"];
+        [invalidURLString containsString:@"%5B"] &&
+        [invalidURLString containsString:@"%5D"] &&
+        [invalidURLString containsString:@"localhost/"] &&
+        [invalidURLString containsString:@"/videos/"];
     }];
     NSArray<PSPDFLinkAnnotation *> *filteredAnnotations = [[self allLinkAnnotations] filteredArrayUsingPredicate:predicate];
     return filteredAnnotations;
