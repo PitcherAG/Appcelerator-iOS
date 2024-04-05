@@ -162,6 +162,7 @@ NSString *const kTempAnnotationIdSuffix = @"_tempPitAnn";
         PSPDFLinkAnnotation *newVideoAnnotation = [[PSPDFLinkAnnotation alloc] initWithURL:newURL];
         newVideoAnnotation.boundingBox = annotation.boundingBox;
         newVideoAnnotation.pageIndex = annotation.pageIndex;
+        newVideoAnnotation.autoplayEnabled = [originalURLString rangeOfString:@"autostart:true"].location != NSNotFound;
         newVideoAnnotation.name = [NSString stringWithFormat:@"%@%@", annotation.uuid, kTempAnnotationIdSuffix];
         
         [annotationsToAdd addObject:newVideoAnnotation];
