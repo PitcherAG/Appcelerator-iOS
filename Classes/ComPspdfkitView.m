@@ -43,6 +43,8 @@
         
         PSPDFDocument *pdfDocument = [[PSPDFDocument alloc] initWithDataProviders:dataProviders];
         NSDictionary *options = [self.proxy valueForKey:@"options"];
+        NSDictionary *documentOptions = [self.proxy valueForKey:@"documentOptions"];
+        [PSPDFUtils installFileBookmarkProviderOnDocument:pdfDocument documentOptions:documentOptions];
         
         PSPDFConfiguration *configuration = [PSPDFConfiguration configurationWithBuilder:^(PSPDFConfigurationBuilder *builder) {
             PSPDFDocumentSharingConfiguration *emailCustomConfiguration = [self getSharingConfigurationForDestination:PSPDFDocumentSharingDestinationEmail];
@@ -55,7 +57,6 @@
         }];
         TIPSPDFViewController *pdfController = [[TIPSPDFViewController alloc] initWithDocument:pdfDocument configuration:configuration];
 
-        NSDictionary *documentOptions = [self.proxy valueForKey:@"documentOptions"];
         NSString *documentTitle = [documentOptions valueForKey:@"title"];
         [PSPDFUtils applyOptions:options onObject:pdfController];
         [PSPDFUtils applyOptions:documentOptions onObject:pdfDocument];

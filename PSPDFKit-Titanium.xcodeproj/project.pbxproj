@@ -33,6 +33,8 @@
 		787023CD1481A0F5005A7792 /* TIPSPDFViewControllerProxy.m in Sources */ = {isa = PBXBuildFile; fileRef = 787023CB1481A0F5005A7792 /* TIPSPDFViewControllerProxy.m */; };
 		7870240C1481BDE8005A7792 /* PSPDFUtils.h in Headers */ = {isa = PBXBuildFile; fileRef = 7870240A1481BDE8005A7792 /* PSPDFUtils.h */; };
 		7870240D1481BDE8005A7792 /* PSPDFUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 7870240B1481BDE8005A7792 /* PSPDFUtils.m */; };
+		A1B2C3D4E5F6071829304A5D /* TIPSPDFFileBookmarkProvider.h in Headers */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6071829304A5B /* TIPSPDFFileBookmarkProvider.h */; };
+		A1B2C3D4E5F6071829304A5E /* TIPSPDFFileBookmarkProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6071829304A5C /* TIPSPDFFileBookmarkProvider.m */; };
 		7884211C148309BE00203926 /* TIPSPDFAnnotationProxy.h in Headers */ = {isa = PBXBuildFile; fileRef = 7884211A148309BE00203926 /* TIPSPDFAnnotationProxy.h */; };
 		7884211D148309BE00203926 /* TIPSPDFAnnotationProxy.m in Sources */ = {isa = PBXBuildFile; fileRef = 7884211B148309BE00203926 /* TIPSPDFAnnotationProxy.m */; };
 		7884211F14830B1600203926 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7884211E14830B1500203926 /* UIKit.framework */; };
@@ -82,6 +84,8 @@
 		787023CB1481A0F5005A7792 /* TIPSPDFViewControllerProxy.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TIPSPDFViewControllerProxy.m; path = Classes/TIPSPDFViewControllerProxy.m; sourceTree = "<group>"; };
 		7870240A1481BDE8005A7792 /* PSPDFUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PSPDFUtils.h; path = Classes/PSPDFUtils.h; sourceTree = "<group>"; };
 		7870240B1481BDE8005A7792 /* PSPDFUtils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PSPDFUtils.m; path = Classes/PSPDFUtils.m; sourceTree = "<group>"; };
+		A1B2C3D4E5F6071829304A5B /* TIPSPDFFileBookmarkProvider.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TIPSPDFFileBookmarkProvider.h; path = Classes/TIPSPDFFileBookmarkProvider.h; sourceTree = "<group>"; };
+		A1B2C3D4E5F6071829304A5C /* TIPSPDFFileBookmarkProvider.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TIPSPDFFileBookmarkProvider.m; path = Classes/TIPSPDFFileBookmarkProvider.m; sourceTree = "<group>"; };
 		7884211A148309BE00203926 /* TIPSPDFAnnotationProxy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TIPSPDFAnnotationProxy.h; path = Classes/TIPSPDFAnnotationProxy.h; sourceTree = "<group>"; };
 		7884211B148309BE00203926 /* TIPSPDFAnnotationProxy.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TIPSPDFAnnotationProxy.m; path = Classes/TIPSPDFAnnotationProxy.m; sourceTree = "<group>"; };
 		7884211E14830B1500203926 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
@@ -187,6 +191,8 @@
 				7884211B148309BE00203926 /* TIPSPDFAnnotationProxy.m */,
 				7870240A1481BDE8005A7792 /* PSPDFUtils.h */,
 				7870240B1481BDE8005A7792 /* PSPDFUtils.m */,
+				A1B2C3D4E5F6071829304A5B /* TIPSPDFFileBookmarkProvider.h */,
+				A1B2C3D4E5F6071829304A5C /* TIPSPDFFileBookmarkProvider.m */,
 				7853C2E91A852074000AA2BD /* PSPDFKit */,
 			);
 			name = Classes;
@@ -246,6 +252,7 @@
 				78ED7A57146F00FE002EE22C /* TIPSPDFViewController.h in Headers */,
 				787023CC1481A0F5005A7792 /* TIPSPDFViewControllerProxy.h in Headers */,
 				7870240C1481BDE8005A7792 /* PSPDFUtils.h in Headers */,
+				A1B2C3D4E5F6071829304A5D /* TIPSPDFFileBookmarkProvider.h in Headers */,
 				7884211C148309BE00203926 /* TIPSPDFAnnotationProxy.h in Headers */,
 				782DDA161483CAB600E7EEFD /* ComPspdfkitViewProxy.h in Headers */,
 				782DDA1D1483CB6100E7EEFD /* ComPspdfkitView.h in Headers */,
@@ -313,6 +320,7 @@
 				787023CD1481A0F5005A7792 /* TIPSPDFViewControllerProxy.m in Sources */,
 				928877FA2615F06700718A17 /* SharingViewController.m in Sources */,
 				7870240D1481BDE8005A7792 /* PSPDFUtils.m in Sources */,
+				A1B2C3D4E5F6071829304A5E /* TIPSPDFFileBookmarkProvider.m in Sources */,
 				7884211D148309BE00203926 /* TIPSPDFAnnotationProxy.m in Sources */,
 				782DDA171483CAB600E7EEFD /* ComPspdfkitViewProxy.m in Sources */,
 				782DDA1E1483CB6100E7EEFD /* ComPspdfkitView.m in Sources */,
