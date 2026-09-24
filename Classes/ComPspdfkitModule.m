@@ -140,6 +140,7 @@ static BOOL PSTReplaceMethodWithBlock(Class c, SEL origSEL, SEL newSEL, id block
             }
             document = [[PSPDFDocument alloc] initWithDataProviders:dataProviders];
         }
+        [PSPDFUtils installFileBookmarkProviderOnDocument:document documentOptions:documentOptions];
         
         TIPSPDFViewController *pdfController = [[TIPSPDFViewController alloc] initWithDocument:document];
 

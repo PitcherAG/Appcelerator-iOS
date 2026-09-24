@@ -51,6 +51,11 @@ FOUNDATION_EXTERN void (^pst_targetActionBlock(id target, SEL action))(id);
 // Returns color from the first argument.
 + (UIColor *)colorFromArg:(id)arg;
 
+// Stores the document's bookmarks in a file inside its `dataDirectory`, instead of inside the PDF
+// (see `TIPSPDFFileBookmarkProvider`). Enabled by default; pass `persistBookmarksExternally: false`
+// in `documentOptions` to keep PSPDFKit's default (PDF embedded) bookmark storage.
++ (void)installFileBookmarkProviderOnDocument:(PSPDFDocument *)document documentOptions:(NSDictionary *)documentOptions;
+
 @end
 
 // Helper

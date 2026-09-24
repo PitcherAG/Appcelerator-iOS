@@ -12,6 +12,10 @@
 
 #import "PSPDFUtils.h"
 #import "TiUtils.h"
+#import "TIPSPDFFileBookmarkProvider.h"
+
+static NSString *const PSPDFUtilsPersistBookmarksExternallyKey = @"persistBookmarksExternally";
+static NSString *const PSPDFUtilsBookmarksFileName = @"pitcher_bookmarks.plist";
 
 @implementation PSPDFUtils
 
@@ -137,6 +141,9 @@
                     processed = YES;
                 } else if ([key isEqual:@"annotationsEnabled"]) {
                     [document setAnnotationsEnabled: [value boolValue]];
+                } else if ([key isEqual:PSPDFUtilsPersistBookmarksExternallyKey]) {
+                    // handled in +[PSPDFUtils installFileBookmarkProviderOnDocument:documentOptions:]
+                    processed = YES;
                 }
             }
 
@@ -177,6 +184,35 @@
         PSPDFViewController *ctrl = object;
         [ctrl reloadData];
     }
+}
+
++ (void)installFileBookmarkProviderOnDocument:(PSPDFDocument *)document documentOptions:(NSDictionary *)documentOptions {
+    if (!document) return;
+
+    id persistOption = [documentOptions isKindOfClass:NSDictionary.class] ? documentOptions[PSPDFUtilsPersistBookmarksExternallyKey] : nil;
+    if ([persistOption isEqual:@"NO"] || ([persistOption respondsToSelector:@selector(boolValue)] && ![persistOption boolValue])) {
+        return;
+    }
+
+    PSPDFBookmarkManager *bookmarkManager = document.bookmarkManager;
+    NSString *dataDirectory = document.dataDirectory;
+    if (!bookmarkManager || dataDirectory.length == 0) {
+        PSCLog(@"Unable to install file bookmark provider (bookmark manager: %@, data directory: %@).", bookmarkManager, dataDirectory);
+        return;
+    }
+
+    NSURL *fileURL = [NSURL fileURLWithPath:[dataDirectory stringByAppendingPathComponent:PSPDFUtilsBookmarksFileName] isDirectory:NO];
+    TIPSPDFFileBookmarkProvider *fileProvider = [[TIPSPDFFileBookmarkProvider alloc] initWithFileURL:fileURL pageCount:document.pageCount];
+
+    // Put the file provider first, so it owns all new page bookmarks. The default provider(s) stay in the list,
+    // so bookmarks already embedded in the PDF are still shown.
+    NSMutableArray<id<PSPDFBookmarkProvider>> *providers = [NSMutableArray arrayWithObject:fileProvider];
+    for (id<PSPDFBookmarkProvider> provider in bookmarkManager.provider) {
+        if (![provider isKindOfClass:TIPSPDFFileBookmarkProvider.class]) {
+            [providers addObject:provider];
+        }
+    }
+    bookmarkManager.provider = providers;
 }
 
 // be smart about path search
