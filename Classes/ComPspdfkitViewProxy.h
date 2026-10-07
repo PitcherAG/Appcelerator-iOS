@@ -76,6 +76,9 @@
 /// PSPDFDocument's annotationSaveMode property.
 - (void)setAnnotationSaveMode:(id)args;
 
+/// Writes a flattened copy of the document. See `-[TIPSPDFViewControllerProxy exportFlattenedPDF:]`.
+- (void)exportFlattenedPDF:(id)args;
+
 /// Hide any visible popover. arg: animated YES/NO
 - (void)hidePopover:(id)args;
 
