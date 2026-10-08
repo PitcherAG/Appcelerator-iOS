@@ -209,6 +209,11 @@ _Pragma("clang diagnostic pop") \
     [[[self pdfView] controllerProxy] setAnnotationSaveMode:args];
 }
 
+- (void)exportFlattenedPDF:(id)args {
+    ENSURE_UI_THREAD(exportFlattenedPDF, args);
+    [[[self pdfView] controllerProxy] exportFlattenedPDF:args];
+}
+
 - (void)hidePopover:(id)args {
     ENSURE_UI_THREAD(hidePopover, args);
     [[[self pdfView] controllerProxy] hidePopover:args];

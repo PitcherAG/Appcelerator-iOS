@@ -116,6 +116,11 @@
 // PSPDFDocument's annotationSaveMode property.
 - (void)setAnnotationSaveMode:(id)arg;
 
+/// Writes a copy of the document to `path` with all annotations (incl. form field values and signatures)
+/// flattened the way they are printed. The original PDF and its external annotations are left untouched.
+/// arg: { path: String, callback: Function({ success: Boolean, path: String, error: String }) }
+- (void)exportFlattenedPDF:(id)arg;
+
 // Hide any visible popover. arg: animated YES/NO
 - (void)hidePopover:(id)args;
 

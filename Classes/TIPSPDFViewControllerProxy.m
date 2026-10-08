@@ -333,6 +333,56 @@ void (^tipspdf_targetActionBlock(id target, SEL action))(id) {
     self.controller.document.annotationSaveMode = annotationSaveMode;
 }
 
+- (void)exportFlattenedPDF:(id)arg {
+    ENSURE_SINGLE_ARG(arg, NSDictionary);
+    ENSURE_UI_THREAD(exportFlattenedPDF, arg);
+
+    KrollCallback *callback = [arg[@"callback"] isKindOfClass:KrollCallback.class] ? arg[@"callback"] : nil;
+    NSString *path = [arg[@"path"] isKindOfClass:NSString.class] ? arg[@"path"] : nil;
+    // Titanium's `nativePath` is a `file://` URL string; the processor needs a plain file system path.
+    if ([path hasPrefix:@"file:"]) {
+        path = [NSURL URLWithString:path].path;
+    }
+    PSPDFDocument *document = self.controller.document;
+
+    void (^finish)(BOOL, NSString *) = ^(BOOL success, NSString *errorMessage) {
+        PSCLog(@"exportFlattenedPDF to %@ finished: %d %@", path, success, errorMessage ?: @"");
+        if (!callback) return;
+        NSMutableDictionary *result = [NSMutableDictionary dictionaryWithObject:@(success) forKey:@"success"];
+        if (path) result[@"path"] = path;
+        if (errorMessage) result[@"error"] = errorMessage;
+        [self _fireEventToListener:@"exportFlattenedPDF" withObject:result listener:callback thisObject:nil];
+    };
+
+    if (path.length == 0 || !document.isValid) {
+        finish(NO, path.length == 0 ? @"Missing output path." : @"No valid document loaded.");
+        return;
+    }
+
+    // The configuration reads the document's current annotations, unsaved changes included, so nothing has to be
+    // saved first. `Print` flattens what is printable and removes the rest, i.e. the same output as the
+    // print → share flow (`PSPDFDocumentSharingAnnotationOptionFlattenForPrint`). Plain `Flatten` loses ink
+    // signatures placed over signature form fields.
+    PSPDFProcessorConfiguration *configuration = [[PSPDFProcessorConfiguration alloc] initWithDocument:document];
+    if (!configuration) {
+        finish(NO, @"Unable to create processor configuration.");
+        return;
+    }
+    [configuration modifyAnnotationsOfTypes:PSPDFAnnotationTypeAll change:PSPDFAnnotationChangePrint];
+
+    dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0), ^{
+        NSURL *outputURL = [NSURL fileURLWithPath:path isDirectory:NO];
+        [NSFileManager.defaultManager removeItemAtURL:outputURL error:NULL];
+
+        NSError *error = nil;
+        PSPDFProcessor *processor = [[PSPDFProcessor alloc] initWithConfiguration:configuration securityOptions:nil];
+        BOOL success = [processor writeToFileURL:outputURL error:&error];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            finish(success, success ? nil : (error.localizedDescription ?: @"Unknown error."));
+        });
+    });
+}
+
 - (void)hidePopover:(id)args {
     ENSURE_UI_THREAD(hidePopover, args);
 
