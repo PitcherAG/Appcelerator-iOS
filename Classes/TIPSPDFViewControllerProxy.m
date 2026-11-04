@@ -49,6 +49,9 @@ void (^tipspdf_targetActionBlock(id target, SEL action))(id) {
 @interface TIPSPDFViewControllerProxy ()
 
 @property (nonatomic) KrollCallback  *didTapOnAnnotationCallback;
+/// URL substrings for link annotations the app handles itself (via the async `didTapOnAnnotation` event).
+/// nil = not configured, fall back to `didTapOnAnnotationCallback`.
+@property (atomic, copy) NSArray<NSString *> *appHandledLinkURLSubstrings;
 @property (nonatomic, weak) TiProxy *parentProxy;
 @property (atomic) CGFloat linkAnnotationBackedStrokeWidth;
 @property (atomic) UIColor *linkAnnotationBorderBackedColor;
@@ -314,6 +317,20 @@ void (^tipspdf_targetActionBlock(id target, SEL action))(id) {
     }
 }
 
+- (void)setHandledLinkURLSubstrings:(id)arg {
+    NSMutableArray<NSString *> *substrings = [NSMutableArray array];
+    if ([arg isKindOfClass:NSArray.class]) {
+        for (id item in arg) {
+            NSString *substring = PSSafeCast(item, NSString.class);
+            if (substring.length > 0) {
+                [substrings addObject:substring];
+            }
+        }
+    }
+    PSCLog(@"handled link URL substrings: %@", substrings);
+    self.appHandledLinkURLSubstrings = substrings;
+}
+
 - (void)saveAnnotations:(id)args {
     ENSURE_UI_THREAD(saveAnnotations, args);
 
@@ -502,9 +519,28 @@ _Pragma("clang diagnostic pop")
     }
 
     BOOL processed = NO;
-    if(self.didTapOnAnnotationCallback) {
+    NSArray<NSString *> *handledSubstrings = self.appHandledLinkURLSubstrings;
+    if (handledSubstrings != nil) {
+        // Decided natively. This delegate runs on the main thread, but with `run-on-main-thread=false` the JS
+        // runs on the Kroll thread. Calling a KrollCallback here runs JS on two threads at once (it bypasses
+        // KrollEntryLock) and can return garbage such as NSNull (CORE-9625). Taking KrollEntryLock here could
+        // deadlock instead, because the Kroll thread may hold it while it waits on the main thread.
+        NSURL *linkURL = PSSafeCast(eventDict[@"URL"], NSURL.class);
+        NSString *urlString = linkURL.absoluteString;
+        if (urlString.length > 0) {
+            for (NSString *substring in handledSubstrings) {
+                if ([urlString rangeOfString:substring].location != NSNotFound) {
+                    processed = YES;
+                    break;
+                }
+            }
+        }
+        PSCLog(@"handled natively: %d", processed);
+    } else if (self.didTapOnAnnotationCallback) {
+        // Legacy path, kept for apps that haven't switched to `setHandledLinkURLSubstrings` yet.
+        // Not thread safe when JS runs on the Kroll thread (see above), so at least don't crash on a non-boolean.
         id retVal = [self.didTapOnAnnotationCallback call:@[eventDict] thisObject:nil];
-        processed = [retVal boolValue];
+        processed = [retVal isKindOfClass:NSNumber.class] && [retVal boolValue];
         PSCLog(@"retVal: %d", processed);
     }
     
