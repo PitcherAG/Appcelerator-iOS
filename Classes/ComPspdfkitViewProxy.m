@@ -147,6 +147,11 @@ _Pragma("clang diagnostic pop") \
     [[[self pdfView] controllerProxy] setDidTapOnAnnotationCallback:args];
 }
 
+- (void)setHandledLinkURLSubstrings:(id)arg {
+    ENSURE_UI_THREAD(setHandledLinkURLSubstrings, arg);
+    [[[self pdfView] controllerProxy] setHandledLinkURLSubstrings:arg];
+}
+
 - (void)setLinkAnnotationStrokeWidth:(id)arg {
     ENSURE_UI_THREAD(setLinkAnnotationStrokeWidth, arg);
     [[[self pdfView] controllerProxy] setLinkAnnotationStrokeWidth:arg];

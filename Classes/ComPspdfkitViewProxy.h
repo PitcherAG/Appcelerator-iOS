@@ -40,7 +40,11 @@
 - (void)close:(id)args;
 
 /// Register a callback for the didTapOnAnnotation event. Return true if you manually use the annotation, else false.
+/// Deprecated, see `-[TIPSPDFViewControllerProxy setDidTapOnAnnotationCallback:]`.
 - (void)setDidTapOnAnnotationCallback:(id)args;
+
+/// Link URL substrings the app handles itself. See `-[TIPSPDFViewControllerProxy setHandledLinkURLSubstrings:]`.
+- (void)setHandledLinkURLSubstrings:(id)arg;
 
 /// Exposes a helper to change link annotation stroke width. Set to change.
 - (void)setLinkAnnotationStrokeWidth:(id)arg;

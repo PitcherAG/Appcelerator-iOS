@@ -57,7 +57,15 @@
 - (void)close:(id)args;
 
 /// Register a callback for the didTapOnAnnotation event. Return true if you manually use the annotation, else false.
+/// Deprecated: the callback is run synchronously from the main thread, which is not thread safe when the app
+/// runs JS on the Kroll thread (`run-on-main-thread=false`). Use `setHandledLinkURLSubstrings:` instead.
+/// Ignored once `setHandledLinkURLSubstrings:` has been called.
 - (void)setDidTapOnAnnotationCallback:(KrollCallback *)callback;
+
+/// Link annotations whose URL contains any of these strings (e.g. `['pitcher://']`) are reported as handled
+/// by the app, so PSPDFKit skips its default action. The app handles them in the `didTapOnAnnotation` event.
+/// Decided natively, without calling into JS. arg: Array of Strings.
+- (void)setHandledLinkURLSubstrings:(id)arg;
 
 /// Opens the PSPDFOutlineViewController
 - (void)showOutlineView:(id)arg;
